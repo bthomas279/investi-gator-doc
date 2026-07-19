@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Investi-gator — Passive AI, bot &amp; scam detection for social media</title>
+<meta name="description" content="Investi-gator is a Chrome extension that passively scans social media posts as you scroll to flag AI-generated images and text, likely bot accounts, and probable scams — no clicking required." />
+<link rel="stylesheet" href="public/main.css" />
+</head>
+<body>
+
+<!--Navigation Code-->
+<nav>
+  <div class="wrap nav-inner">
+    <div class="brand"><span class="logo">🐊🔍</span> Investi-gator</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#passive">How it works</a>
+      <a href="#demo">Demo</a>
+      <a href="#tech">Tech</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="logo-badge">🐊🔍</span>
+    <h1>Spot AI, bots, and scams<br /><span class="grad">while you scroll.</span></h1>
+    <p class="lede">
+      Investi-gator is a Chrome extension that passively inspects social media posts as they load —
+      flagging AI-generated images and text, likely bot accounts, and probable scams without you lifting a finger.
+    </p>
+    <div class="badges">
+      <span class="chip">🧩 Chrome Extension</span>
+      <span class="chip">⚡ Passive &amp; real-time</span>
+      <span class="chip">🖼️ AI image detection</span>
+      <span class="chip">✍️ AI text detection</span>
+      <span class="chip">🤖 Bot account signals</span>
+      <span class="chip">🎣 Scam flagging</span>
+    </div>
+    <div class="cta">
+      <a class="btn btn-primary" href="#features">See what it detects →</a>
+      <a class="btn btn-ghost" href="#demo">Watch the demo</a>
+    </div>
+  </div>
+</header>
+
+<section class="block" id="features">
+  <div class="wrap">
+    <p class="eyebrow">What it detects</p>
+    <h2>Four layers of scrutiny on every post</h2>
+    <p class="section-lede">
+      As posts enter your feed, Investi-gator runs a set of lightweight detectors in the background and
+      surfaces a clear, unobtrusive verdict on anything that looks off.
+    </p>
+    <div class="grid">
+      <div class="feat">
+        <span class="ico">🖼️</span>
+        <h3>AI-generated images</h3>
+        <p>Analyzes images attached to posts and flags those that show the tell-tale signatures of generative models.</p>
+      </div>
+      <div class="feat">
+        <span class="ico">✍️</span>
+        <h3>AI-generated text</h3>
+        <p>Scores post text for machine-written patterns, helping you tell authentic voices from synthetic ones.</p>
+      </div>
+      <div class="feat">
+        <span class="ico">🤖</span>
+        <h3>Likely bot accounts</h3>
+        <p>Weighs account signals to estimate whether the poster is an automated or inauthentic account.</p>
+      </div>
+      <div class="feat">
+        <span class="ico">🎣</span>
+        <h3>Probable scams</h3>
+        <p>Recognizes scam patterns in posts and comments so you can steer clear before you ever engage.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="passive">
+  <div class="wrap">
+    <div class="highlight">
+      <div>
+        <p class="eyebrow">Zero effort</p>
+        <h2>Detection that happens as you scroll</h2>
+        <p class="highlight-body">
+          There's no button to press and no post to paste. Investi-gator watches your feed passively, evaluating
+          each post the moment it appears and quietly tagging the ones worth a second look — so protection is the
+          default, not an extra step.
+        </p>
+      </div>
+      <div class="pulse-demo" aria-hidden="true">
+        <div class="post-row">
+          <div class="avatar"></div>
+          <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
+          <span class="flag ai">AI image</span>
+        </div>
+        <div class="post-row">
+          <div class="avatar"></div>
+          <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
+          <span class="flag bot">Likely bot</span>
+        </div>
+        <div class="post-row">
+          <div class="avatar"></div>
+          <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
+          <span class="flag scam">Scam risk</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <p class="eyebrow">Under the hood</p>
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Observe</h3>
+        <p>A content script watches the feed and picks up new posts as they render, without interrupting your browsing.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Analyze</h3>
+        <p>Each post's images, text, and account details are passed to the detectors for a quick verdict.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>Flag</h3>
+        <p>Anything suspicious gets an inline badge, keeping you informed while you keep scrolling.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="demo">
+  <div class="wrap">
+    <p class="eyebrow">See it in action</p>
+    <h2>Screenshots &amp; demo</h2>
+    <p class="section-lede">Media coming soon — these slots are ready for real screenshots and a walkthrough video.</p>
+    <div class="media-grid">
+      <div class="media wide">
+        <span class="mi">🎬</span>
+        <span class="cap">Demo video</span>
+        <span class="hint">Drop a video or embed here</span>
+      </div>
+      <div class="media">
+        <span class="mi">🖼️</span>
+        <span class="cap">Inline flags on a live feed</span>
+        <span class="hint">Screenshot placeholder</span>
+      </div>
+      <div class="media">
+        <span class="mi">🖼️</span>
+        <span class="cap">Extension popup / details</span>
+        <span class="hint">Screenshot placeholder</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="tech">
+  <div class="wrap">
+    <p class="eyebrow">Built with</p>
+    <h2>Tech stack</h2>
+    <p class="section-lede">A brief look at the pieces that power Investi-gator. <span class="note">(Edit this list to match your build.)</span></p>
+    <div class="tech-list">
+      <span class="chip">Chrome Extension (Manifest V3)</span>
+      <span class="chip">JavaScript</span>
+      <span class="chip">Content scripts</span>
+      <span class="chip">Node.js backend</span>
+      <span class="chip">Detection APIs</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div>
+      <div class="brand"><span class="logo">🐊🔍</span> Investi-gator</div>
+      <div class="note">© <span id="year">2026</span> · The source repository is currently private. This page serves as its public overview. Contact me if you have more questions about Investi-gator and its progress.</div>
+    </div>
+    <div>
+      <a href="mailto:benluthomas@gmail.com">Contact →</a>
+    </div>
+  </div>
+</footer>
+
+<script src="backend/main.js"></script>
+</body>
+</html>

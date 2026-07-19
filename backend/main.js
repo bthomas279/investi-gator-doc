@@ -76,6 +76,27 @@
     });
   }
 
+  /* Detection badges -----------------------------------------------------
+     Paint the sample badges using the extension's real BADGE_STYLES
+     (see views/detection-styles.js) so the page always matches what the
+     extension actually renders. The markup ships with plain-text labels as
+     a fallback, so this only ever upgrades what's already there. */
+  function initDetectionBadges() {
+    var styles = window.BADGE_STYLES;
+    if (!styles) return;
+
+    document.querySelectorAll("[data-detection]").forEach(function (el) {
+      var style = styles[el.dataset.detection];
+      if (!style) return;
+
+      el.style.background = style.bg;
+      el.style.color = style.fg;
+      el.style.borderColor = style.fg;
+      // Icons are static markup from our own source file, not user input.
+      el.innerHTML = style.icon + "<span>" + style.label + "</span>";
+    });
+  }
+
   /* Current year in the footer ------------------------------------------- */
   function initYear() {
     var el = document.getElementById("year");
@@ -83,6 +104,7 @@
   }
 
   function init() {
+    initDetectionBadges();
     initScrollReveal();
     initActiveNav();
     initYear();

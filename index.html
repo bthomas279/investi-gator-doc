@@ -3,9 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Investi-gator — Passive AI, bot &amp; scam detection for social media</title>
-<meta name="description" content="Investi-gator is a Chrome extension that passively scans social media posts as you scroll to flag AI-generated images and text, likely bot accounts, and probable scams — no clicking required." />
+<title>Investi-gator Extension Documentation</title>
+<!-- main.css defines the design tokens, so it must load before the section files. -->
 <link rel="stylesheet" href="public/main.css" />
+<link rel="stylesheet" href="public/features.css" />
+<link rel="stylesheet" href="public/how-it-works.css" />
+<link rel="stylesheet" href="public/demo.css" />
 </head>
 <body>
 
@@ -25,19 +28,11 @@
 <header class="hero">
   <div class="wrap">
     <span class="logo-badge">🐊🔍</span>
-    <h1>Spot AI, bots, and scams<br /><span class="grad">while you scroll.</span></h1>
+    <h1>Detect AI, bots, and scams<br /><span class="grad">while scrolling.</span></h1>
     <p class="lede">
-      Investi-gator is a Chrome extension that passively inspects social media posts as they load —
-      flagging AI-generated images and text, likely bot accounts, and probable scams without you lifting a finger.
+      Investi-gator is a Chrome extension that passively reads posts on social media platforms as they load, badging posts that contain
+      AI-generated images and text, are likely bot accounts, and/or are scams without you lifting a finger.
     </p>
-    <div class="badges">
-      <span class="chip">🧩 Chrome Extension</span>
-      <span class="chip">⚡ Passive &amp; real-time</span>
-      <span class="chip">🖼️ AI image detection</span>
-      <span class="chip">✍️ AI text detection</span>
-      <span class="chip">🤖 Bot account signals</span>
-      <span class="chip">🎣 Scam flagging</span>
-    </div>
     <div class="cta">
       <a class="btn btn-primary" href="#features">See what it detects →</a>
       <a class="btn btn-ghost" href="#demo">Watch the demo</a>
@@ -50,14 +45,14 @@
     <p class="eyebrow">What it detects</p>
     <h2>Four layers of scrutiny on every post</h2>
     <p class="section-lede">
-      As posts enter your feed, Investi-gator runs a set of lightweight detectors in the background and
-      surfaces a clear, unobtrusive verdict on anything that looks off.
+      As posts enter your feed, Investi-gator runs multiple light local detectors in the background for each post,
+      generating badges for any post that exibits any of the detection types, along with confidence and reasoning.
     </p>
     <div class="grid">
       <div class="feat">
         <span class="ico">🖼️</span>
         <h3>AI-generated images</h3>
-        <p>Analyzes images attached to posts and flags those that show the tell-tale signatures of generative models.</p>
+        <p>Analyzes images attached to posts and flags those signatures of generative models.</p>
       </div>
       <div class="feat">
         <span class="ico">✍️</span>
@@ -72,7 +67,7 @@
       <div class="feat">
         <span class="ico">🎣</span>
         <h3>Probable scams</h3>
-        <p>Recognizes scam patterns in posts and comments so you can steer clear before you ever engage.</p>
+        <p>Recognizes scam, phishing, and spam patterns in posts and comments so you can avoid them before engaging.</p>
       </div>
     </div>
   </div>
@@ -94,23 +89,29 @@
         <div class="post-row">
           <div class="avatar"></div>
           <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
-          <span class="flag ai">AI image</span>
+          <span class="flag" data-detection="image">AI Image</span>
         </div>
         <div class="post-row">
           <div class="avatar"></div>
           <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
-          <span class="flag bot">Likely bot</span>
+          <span class="flag" data-detection="text">AI Text</span>
         </div>
         <div class="post-row">
           <div class="avatar"></div>
           <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
-          <span class="flag scam">Scam risk</span>
+          <span class="flag" data-detection="bot">Likely Bot</span>
+        </div>
+        <div class="post-row">
+          <div class="avatar"></div>
+          <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
+          <span class="flag" data-detection="scam">Scam</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
+<!--Steps on how Investi-gator works-->
 <section class="block">
   <div class="wrap">
     <p class="eyebrow">Under the hood</p>
@@ -119,17 +120,27 @@
       <div class="step">
         <div class="num">1</div>
         <h3>Observe</h3>
-        <p>A content script watches the feed and picks up new posts as they render, without interrupting your browsing.</p>
+        <p>A content script watches the social media feed and reads new posts as they render passively.</p>
       </div>
       <div class="step">
         <div class="num">2</div>
-        <h3>Analyze</h3>
-        <p>Each post's images, text, and account details are passed to the detectors for a quick verdict.</p>
+        <h3>Local Analysis</h3>
+        <p>Each post's text and media are passed to the local models for analysis where they return it's classification and confidence for each type.</p>
       </div>
       <div class="step">
         <div class="num">3</div>
-        <h3>Flag</h3>
-        <p>Anything suspicious gets an inline badge, keeping you informed while you keep scrolling.</p>
+        <h3>Cloud Analysis</h3>
+        <p>If a local model give a low enough confidence score for a detection type, a heavier cloud model for that type is called to classify the post.</p>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <h3>Generate</h3>
+        <p>Any positive detection that is allowed by the user's personal settings and Investi-gator's requirements are badged and displayed along with the confidence</p>
+      </div>
+      <div class="step">
+        <div class="num">5</div>
+        <h3>Reason</h3>
+        <p>When you click on a badge, the content scripts requests the reasoning for the positive detection for each type. This can range from LIME, SHAP, Grad-CAM, or heatmaps depending on the detection type.</p>
       </div>
     </div>
   </div>
@@ -139,7 +150,7 @@
   <div class="wrap">
     <p class="eyebrow">See it in action</p>
     <h2>Screenshots &amp; demo</h2>
-    <p class="section-lede">Media coming soon — these slots are ready for real screenshots and a walkthrough video.</p>
+    <p class="section-lede">Below is the current state of the extension popup, badge/badge-popup, and runtime.</p>
     <div class="media-grid">
       <div class="media wide">
         <span class="mi">🎬</span>
@@ -147,14 +158,10 @@
         <span class="hint">Drop a video or embed here</span>
       </div>
       <div class="media">
-        <span class="mi">🖼️</span>
-        <span class="cap">Inline flags on a live feed</span>
-        <span class="hint">Screenshot placeholder</span>
+        <img src="public/images/placeholder_badges.png" alt="All detection types running (Placeholders )"> 
       </div>
       <div class="media">
-        <span class="mi">🖼️</span>
-        <span class="cap">Extension popup / details</span>
-        <span class="hint">Screenshot placeholder</span>
+        <img src="public/images/current_popup.png">
       </div>
     </div>
   </div>
@@ -164,13 +171,28 @@
   <div class="wrap">
     <p class="eyebrow">Built with</p>
     <h2>Tech stack</h2>
-    <p class="section-lede">A brief look at the pieces that power Investi-gator. <span class="note">(Edit this list to match your build.)</span></p>
+    <p class="section-lede">A quick look at the tools that power Investi-gator. <span class="note">(Edit this list to match your build.)</span></p>
+    <h4>Software:</h4>
     <div class="tech-list">
-      <span class="chip">Chrome Extension (Manifest V3)</span>
-      <span class="chip">JavaScript</span>
-      <span class="chip">Content scripts</span>
-      <span class="chip">Node.js backend</span>
-      <span class="chip">Detection APIs</span>
+      <span class="chip">Chrome (Manifest V3)</span>
+      <span class="chip">TypeScript</span>
+      <span class="chip">Vite</span>
+      <span class="chip">React.js</span>
+      <span class="chip">Service Workers</span>
+      <span class="chip">Mutation Observer</span>
+      <span class="chip">HTML</span>
+      <span class="chip">CSS</span>
+    </div>
+    <h4>AI/ML:</h4>
+    <div class="tech-list">
+      <span class="chip">Python</span>
+      <span class="chip">PyTorch</span>
+      <span class="chip">HuggingFace Transformers</span>
+      <span class="chip">Transformers.js</span>
+      <span class="chip">Scikit-learn</span>
+      <span class="chip">ONNX (runtime)</span>
+      <span class="chip">LIME</span>
+      <span class="chip">FastAPI</span>
     </div>
   </div>
 </section>
@@ -179,7 +201,8 @@
   <div class="wrap footer-inner">
     <div>
       <div class="brand"><span class="logo">🐊🔍</span> Investi-gator</div>
-      <div class="note">© <span id="year">2026</span> · The source repository is currently private. This page serves as its public overview. Contact me if you have more questions about Investi-gator and its progress.</div>
+      <div class="disclaimer">Disclaimer: Investi-gator is currently deep in development. Not all features mentioned are implemented or refined yet. Design decisions and features will be subject to change.</div>
+      <div class="note">© <span id="year">2026</span> · Investi-gator's repository is currently private. This page serves as its public overview. Contact me if you have more questions about Investi-gator and its progress.</div>
     </div>
     <div>
       <a href="mailto:benluthomas@gmail.com">Contact →</a>
@@ -187,6 +210,8 @@
   </div>
 </footer>
 
+<!-- Badge data must load before main.js, which reads BADGE_STYLES off the global. -->
+<script src="views/detection-styles.js"></script>
 <script src="backend/main.js"></script>
 </body>
 </html>

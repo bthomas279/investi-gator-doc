@@ -1,0 +1,48 @@
+/* ==========================================================================
+   Investi-gator — "What it detects" section (#features)
+
+   Scope: the four detector cards and the grid that lays them out.
+   Requires main.css (design tokens + section shell) to be loaded first.
+   ========================================================================== */
+
+/* Card grid -------------------------------------------------------------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+@media (max-width: 720px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+/* Detector card ---------------------------------------------------------- */
+.feat {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 26px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.feat:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--card-border));
+  transform: translateY(-3px);
+}
+
+.feat .ico {
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: 14px;
+}
+
+.feat h3 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+
+.feat p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.96rem;
+}

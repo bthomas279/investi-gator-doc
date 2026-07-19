@@ -1,0 +1,80 @@
+/* ==========================================================================
+   Investi-gator — "Screenshots & demo" section (#demo)
+
+   Scope: the media grid and its placeholder tiles. When real screenshots
+   and video replace the placeholders, drop the dashed border on .media and
+   swap the inner spans for <img> / <video> — the aspect ratios are already
+   fixed here, so the layout won't shift.
+   Requires main.css (design tokens + section shell) to be loaded first.
+   ========================================================================== */
+
+/* Media grid ------------------------------------------------------------- */
+.media-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+@media (max-width: 720px) {
+  .media-grid { grid-template-columns: 1fr; }
+}
+
+/* Placeholder tile ------------------------------------------------------- */
+.media {
+  border: 1.5px dashed var(--card-border);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  aspect-ratio: 16 / 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+/* Full-width tile, used for the demo video */
+.media.wide {
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 7;
+}
+
+.media .mi   { font-size: 2rem; opacity: 0.7; }
+.media .cap  { font-size: 0.9rem; }
+.media .hint { font-size: 0.78rem; opacity: 0.7; }
+
+/* Real media, once it replaces the placeholders --------------------------
+   A tile holding an <img>/<video>/<iframe> drops the dashed placeholder
+   frame automatically, so filling a slot only means editing index.html. */
+.media:has(img),
+.media:has(video),
+.media:has(iframe) {
+  border-style: solid;
+  padding: 0;
+  overflow: hidden;
+}
+
+.media img,
+.media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Embedded video (YouTube etc.) — object-fit doesn't apply to iframes. */
+.media iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* Optional caption under a filled tile */
+.media-caption {
+  margin: 8px 2px 0;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}

@@ -1,5 +1,16 @@
 /* ==========================================================================
-   Investi-gator — overview page styles
+   Investi-gator — global styles
+
+   Everything shared across the page lives here: design tokens, base
+   elements, nav, hero, the section shell, and the footer. Anything used by
+   a single section lives in its own file instead:
+
+     features.css      → #features   (detector cards)
+     how-it-works.css  → #passive    (highlight panel, mock feed) + steps
+     demo.css          → #demo       (screenshot / video placeholders)
+
+   Load order matters: main.css must come first, since the section files
+   depend on the tokens defined below.
    ========================================================================== */
 
 /* Design tokens ---------------------------------------------------------- */
@@ -50,7 +61,12 @@ body {
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
-.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+/* Centered page gutter, used by every section */
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
 
 /* Nav -------------------------------------------------------------------- */
 nav {
@@ -69,6 +85,7 @@ nav {
   height: 62px;
 }
 
+/* Also used in the footer */
 .brand {
   display: flex;
   align-items: center;
@@ -143,18 +160,20 @@ nav {
   margin-bottom: 30px;
 }
 
+/* Shared pill — used by the hero badges and the tech list */
 .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.82rem;
   padding: 6px 13px;
   border-radius: 999px;
   border: 1px solid var(--card-border);
   background: var(--card);
   color: var(--text-dim);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
+/* Buttons ---------------------------------------------------------------- */
 .cta {
   display: inline-flex;
   gap: 14px;
@@ -189,7 +208,8 @@ nav {
 
 .btn-ghost:hover { border-color: var(--accent); text-decoration: none; }
 
-/* Section shell ---------------------------------------------------------- */
+/* Section shell ----------------------------------------------------------
+   Wrapper and headings shared by every content section. */
 section.block {
   padding: 68px 0;
   border-top: 1px solid var(--card-border);
@@ -217,169 +237,8 @@ h2 {
   margin: 0 0 40px;
 }
 
-/* Feature grid ----------------------------------------------------------- */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-}
-
-@media (max-width: 720px) {
-  .grid { grid-template-columns: 1fr; }
-}
-
-.feat {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  padding: 26px;
-  transition: border-color 0.15s ease, transform 0.15s ease;
-}
-
-.feat:hover {
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--card-border));
-  transform: translateY(-3px);
-}
-
-.feat .ico { font-size: 1.8rem; margin-bottom: 14px; display: block; }
-.feat h3 { margin: 0 0 8px; font-size: 1.15rem; }
-.feat p { margin: 0; color: var(--text-dim); font-size: 0.96rem; }
-
-/* Passive-scanning highlight --------------------------------------------- */
-.highlight {
-  background: linear-gradient(135deg, var(--bg-soft), var(--card));
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  padding: 40px;
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 32px;
-  align-items: center;
-}
-
-@media (max-width: 720px) {
-  .highlight { grid-template-columns: 1fr; padding: 28px; }
-}
-
-.highlight h2 { margin-top: 0; }
-.highlight-body { color: var(--text-dim); margin: 0; }
-
-.pulse-demo {
-  background: var(--bg);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  padding: 18px;
-  font-size: 0.9rem;
-}
-
-.post-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--card-border);
-}
-
-.post-row:last-child { border-bottom: none; }
-
-.avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--card-border);
-  flex-shrink: 0;
-}
-
-.post-meta { flex: 1; min-width: 0; }
-
-.post-meta .line {
-  height: 8px;
-  border-radius: 4px;
-  background: var(--card-border);
-  margin: 4px 0;
-}
-
-.post-meta .line.short { width: 55%; }
-
-.flag {
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-
-.flag.ai   { background: rgba(52, 211, 153, 0.15); color: var(--accent); border: 1px solid var(--accent); }
-.flag.bot  { background: rgba(251, 191, 36, 0.14); color: var(--warn);   border: 1px solid var(--warn); }
-.flag.scam { background: rgba(248, 113, 113, 0.14); color: var(--danger); border: 1px solid var(--danger); }
-
-/* Steps ------------------------------------------------------------------ */
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-
-@media (max-width: 720px) {
-  .steps { grid-template-columns: 1fr; }
-}
-
-.step {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius);
-  padding: 26px;
-  position: relative;
-}
-
-.step .num {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: var(--accent-glow);
-  color: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  margin-bottom: 14px;
-}
-
-.step h3 { margin: 0 0 6px; font-size: 1.08rem; }
-.step p { margin: 0; color: var(--text-dim); font-size: 0.95rem; }
-
-/* Media placeholders ----------------------------------------------------- */
-.media-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-}
-
-@media (max-width: 720px) {
-  .media-grid { grid-template-columns: 1fr; }
-}
-
-.media {
-  border: 1.5px dashed var(--card-border);
-  border-radius: var(--radius);
-  background: var(--bg-soft);
-  aspect-ratio: 16 / 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: var(--text-dim);
-  text-align: center;
-  padding: 20px;
-}
-
-.media.wide { grid-column: 1 / -1; aspect-ratio: 16 / 7; }
-.media .mi { font-size: 2rem; opacity: 0.7; }
-.media .cap { font-size: 0.9rem; }
-.media .hint { font-size: 0.78rem; opacity: 0.7; }
-
-/* Tech ------------------------------------------------------------------- */
+/* Tech list --------------------------------------------------------------
+   Small enough to stay here rather than warrant its own file. */
 .tech-list { display: flex; flex-wrap: wrap; gap: 10px; }
 .tech-list .chip { font-size: 0.9rem; background: var(--card); }
 
@@ -404,9 +263,10 @@ footer {
 .note { font-size: 0.82rem; opacity: 0.75; margin-top: 8px; }
 
 /* Scroll reveal ----------------------------------------------------------
-   main.js adds .reveal to eligible elements, then .is-visible as they
-   enter the viewport. Without JS nothing is hidden, so the page still
-   reads fine with scripts disabled. */
+   main.js adds .reveal to eligible elements, then .is-visible as they enter
+   the viewport. Targets live in several sections (.feat, .step, .media,
+   .highlight), so these rules stay global. Without JS nothing is hidden, so
+   the page still reads fine with scripts disabled. */
 .reveal {
   opacity: 0;
   transform: translateY(16px);

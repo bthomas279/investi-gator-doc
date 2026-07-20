@@ -30,8 +30,8 @@
 
 .media-item.wide { grid-column: 1 / -1; }
 
-/* The video slot is a shallower crop than the screenshot tiles */
-.media-item.wide .media { aspect-ratio: 16 / 7; }
+/* The video slot uses a standard 16:9 frame */
+.media-item.wide .media { aspect-ratio: 16 / 9; }
 
 /* Placeholder tile ------------------------------------------------------- */
 .media {

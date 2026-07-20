@@ -31,7 +31,7 @@
     <h1>Detect AI, bots, and scams<br /><span class="grad">while scrolling.</span></h1>
     <p class="lede">
       Investi-gator is a Chrome extension that passively reads posts on social media platforms as they load, badging posts that contain
-      AI-generated images and text, are likely bot accounts, and/or are scams without you lifting a finger.
+      AI-generated images and text, are likely bot accounts, and/or are potentially scams without you lifting a finger.
     </p>
     <div class="cta">
       <a class="btn btn-primary" href="#features">See what it detects →</a>
@@ -46,28 +46,34 @@
     <h2>Four layers of scrutiny on every post</h2>
     <p class="section-lede">
       As posts enter your feed, Investi-gator runs multiple light local detectors in the background for each post,
-      generating badges for any post that exibits any of the detection types, along with confidence and reasoning.
+      generating badges for any post that exibits any of the four detection types below, along with confidence and reasoning.
     </p>
     <div class="grid">
       <div class="feat">
-        <span class="ico">🖼️</span>
-        <h3>AI-generated images</h3>
-        <p>Analyzes images attached to posts and flags those signatures of generative models.</p>
+        <span class="flag" data-detection="image">AI Image</span>
+        <hr>
+        <h3>AI-Generated Images</h3>
+        <p>Analyzes images attached to posts and flags those created by generative models.</p>
       </div>
       <div class="feat">
-        <span class="ico">✍️</span>
-        <h3>AI-generated text</h3>
+        <span class="flag" data-detection="text">AI Text</span>
+        <hr>
+        <h3>AI-Generated Text</h3>
         <p>Scores post text for machine-written patterns, helping you tell authentic voices from synthetic ones.</p>
+        <p>V1 of the detector was trained on samples from liamdugn/raid and yaful/MAGE on Hugging Face covering genres ranging from reddit posts, news, reviews and more.</p>
       </div>
       <div class="feat">
-        <span class="ico">🤖</span>
-        <h3>Likely bot accounts</h3>
+        <span class="flag" data-detection="bot">Likely Bot</span>
+        <hr>
+        <h3>Bot Accounts</h3>
         <p>Weighs account signals to estimate whether the poster is an automated or inauthentic account.</p>
       </div>
       <div class="feat">
-        <span class="ico">🎣</span>
-        <h3>Probable scams</h3>
+        <span class="flag" data-detection="scam">Scam</span>
+        <hr>
+        <h3>Probable Scams</h3>
         <p>Recognizes scam, phishing, and spam patterns in posts and comments so you can avoid them before engaging.</p>
+        <p>V1 of the detector was also trained on 13 different types of social media scams/spam involving engagement farming spam, fake giveaways, fake hiring posts, impersonation, crypto pumps, and more. </p>
       </div>
     </div>
   </div>
@@ -77,12 +83,11 @@
   <div class="wrap">
     <div class="highlight">
       <div>
-        <p class="eyebrow">Zero effort</p>
+        <p class="eyebrow">Quick and Easy</p>
         <h2>Detection that happens as you scroll</h2>
         <p class="highlight-body">
-          There's no button to press and no post to paste. Investi-gator watches your feed passively, evaluating
-          each post the moment it appears and quietly tagging the ones worth a second look — so protection is the
-          default, not an extra step.
+          No need to manually turn on, paste text, or upload images. Investi-gator checks your feed automatically and evaluates
+          each post the moment it appears while quietly badging ones deemed suspicious.
         </p>
       </div>
       <div class="pulse-demo" aria-hidden="true">
@@ -99,7 +104,7 @@
         <div class="post-row">
           <div class="avatar"></div>
           <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
-          <span class="flag" data-detection="bot">Likely Bot</span>
+          <span class="flag" data-detection="bot">Bot</span>
         </div>
         <div class="post-row">
           <div class="avatar"></div>
@@ -114,8 +119,8 @@
 <!--Steps on how Investi-gator works-->
 <section class="block">
   <div class="wrap">
-    <p class="eyebrow">Under the hood</p>
-    <h2>How it works</h2>
+    <p class="eyebrow">Beneath the surface</p>
+    <h2>How it Works</h2>
     <div class="steps">
       <div class="step">
         <div class="num">1</div>
@@ -142,6 +147,11 @@
         <h3>Reason</h3>
         <p>When you click on a badge, the content scripts requests the reasoning for the positive detection for each type. This can range from LIME, SHAP, Grad-CAM, or heatmaps depending on the detection type.</p>
       </div>
+      <div class="step">
+        <div class="num">6</div>
+        <h3>Customize</h3>
+        <p>From hiding high confidence posts to custom confidence requirements for badges to appear, Investi-gator contains many adjustable settings allowing you to use Investi-gator your way.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -152,17 +162,32 @@
     <h2>Screenshots &amp; demo</h2>
     <p class="section-lede">Below is the current state of the extension popup, badge/badge-popup, and runtime.</p>
     <div class="media-grid">
-      <div class="media wide">
-        <span class="mi">🎬</span>
-        <span class="cap">Demo video</span>
-        <span class="hint">Drop a video or embed here</span>
-      </div>
-      <div class="media">
-        <img src="public/images/placeholder_badges.png" alt="All detection types running (Placeholders )"> 
-      </div>
-      <div class="media">
-        <img src="public/images/current_popup.png">
-      </div>
+      <figure class="media-item wide">
+        <div class="media">
+          <span class="mi">🎬</span>
+          <span class="cap">Demo video</span>
+          <span class="hint">Drop a video or embed here</span>
+        </div>
+        <figcaption class="media-caption">
+          <strong>Full walkthrough.</strong> Describe what the video covers here.
+        </figcaption>
+      </figure>
+      <figure class="media-item">
+        <div class="media">
+          <img src="public/images/placeholder_badges.png" alt="All detection types running (Placeholders)">
+        </div>
+        <figcaption class="media-caption">
+          <strong>All detection badge types.</strong> At the time this picture was taken, all detections and reasonings were placeholders.
+        </figcaption>
+      </figure>
+      <figure class="media-item">
+        <div class="media">
+          <img src="public/images/current_popup.png" alt="Investi-gator's popup in action">
+        </div>
+        <figcaption class="media-caption">
+          <strong>Investi-gator's popup.</strong> Contains counters for each detection type, a toggle to quickly pause all activity, and a button to take you to the settings.
+        </figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -171,7 +196,7 @@
   <div class="wrap">
     <p class="eyebrow">Built with</p>
     <h2>Tech stack</h2>
-    <p class="section-lede">A quick look at the tools that power Investi-gator. <span class="note">(Edit this list to match your build.)</span></p>
+    <p class="section-lede">
     <h4>Software:</h4>
     <div class="tech-list">
       <span class="chip">Chrome (Manifest V3)</span>

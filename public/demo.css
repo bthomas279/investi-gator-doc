@@ -19,6 +19,20 @@
   .media-grid { grid-template-columns: 1fr; }
 }
 
+/* Grid cell: one tile plus its caption ------------------------------------
+   The <figure> is the grid child, so `wide` belongs here rather than on
+   .media itself. */
+.media-item {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.media-item.wide { grid-column: 1 / -1; }
+
+/* The video slot is a shallower crop than the screenshot tiles */
+.media-item.wide .media { aspect-ratio: 16 / 7; }
+
 /* Placeholder tile ------------------------------------------------------- */
 .media {
   border: 1.5px dashed var(--card-border);
@@ -33,12 +47,6 @@
   padding: 20px;
   color: var(--text-dim);
   text-align: center;
-}
-
-/* Full-width tile, used for the demo video */
-.media.wide {
-  grid-column: 1 / -1;
-  aspect-ratio: 16 / 7;
 }
 
 .media .mi   { font-size: 2rem; opacity: 0.7; }
@@ -72,9 +80,19 @@
   display: block;
 }
 
-/* Optional caption under a filled tile */
+/* Caption under a tile ---------------------------------------------------
+   Sits outside the fixed-ratio frame, so longer text grows downward
+   instead of squeezing the image. */
 .media-caption {
-  margin: 8px 2px 0;
-  font-size: 0.82rem;
+  margin: 10px 2px 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
   color: var(--text-dim);
+  text-align: left;
+}
+
+/* Lead-in phrase, for calling out what to look at */
+.media-caption strong {
+  color: var(--text);
+  font-weight: 600;
 }

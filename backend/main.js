@@ -17,7 +17,7 @@
   function initScrollReveal() {
     if (prefersReducedMotion || !("IntersectionObserver" in window)) return;
 
-    var targets = document.querySelectorAll(".feat, .step, .media, .highlight");
+    var targets = document.querySelectorAll(".feat, .step, .media-item, .highlight");
     if (!targets.length) return;
 
     var observer = new IntersectionObserver(function (entries) {

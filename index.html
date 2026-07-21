@@ -15,7 +15,7 @@
 <!--Navigation Code-->
 <nav>
   <div class="wrap nav-inner">
-    <div class="brand"><span class="logo">🐊🔍</span> Investi-gator</div>
+    <div class="brand"><span class="logo">🔍🐊</span> Investi-gator</div>
     <div class="nav-links">
       <a href="#features">Features</a>
       <a href="#passive">How it works</a>
@@ -27,7 +27,7 @@
 
 <header class="hero">
   <div class="wrap">
-    <span class="logo-badge">🐊🔍</span>
+    <span class="logo-badge">🔍🐊</span>
     <h1>Detect AI, bots, and scams<br /><span class="grad">while scrolling.</span></h1>
     <p class="lede">
       Investi-gator is a Chrome extension that passively reads posts on social media platforms as they load, badging posts that contain
@@ -43,10 +43,10 @@
 <section class="block" id="features">
   <div class="wrap">
     <p class="eyebrow">What it detects</p>
-    <h2>Four layers of scrutiny on every post</h2>
+    <h2>Four layers of inspection on every post</h2>
     <p class="section-lede">
-      As posts enter your feed, Investi-gator runs multiple light local detectors in the background for each post,
-      generating badges for any post that exibits any of the four detection types below, along with confidence and reasoning.
+      As posts enter your feed, Investi-gator runs multiple light local AI models in the background for each post,
+      generating badges for any post that exibits one or more of the four detection types below along with confidence and reasoning.
     </p>
     <div class="grid">
       <div class="feat">
@@ -59,21 +59,19 @@
         <span class="flag" data-detection="text">AI Text</span>
         <hr>
         <h3>AI-Generated Text</h3>
-        <p>Scores post text for machine-written patterns, helping you tell authentic voices from synthetic ones.</p>
-        <p>V1 of the detector was trained on samples from liamdugn/raid and yaful/MAGE on Hugging Face covering genres ranging from reddit posts, news, reviews and more.</p>
+        <p>Checks post text for machine-written patterns to help you tell authentic posts from synthetic ones.</p>
       </div>
       <div class="feat">
         <span class="flag" data-detection="bot">Likely Bot</span>
         <hr>
         <h3>Bot Accounts</h3>
-        <p>Weighs account signals to estimate whether the poster is an automated or inauthentic account.</p>
+        <p>Weighs post and account signals to determine whether the poster is an automated or inauthentic account.</p>
       </div>
       <div class="feat">
         <span class="flag" data-detection="scam">Scam</span>
         <hr>
         <h3>Probable Scams</h3>
         <p>Recognizes scam, phishing, and spam patterns in posts and comments so you can avoid them before engaging.</p>
-        <p>V1 of the detector was also trained on 13 different types of social media scams/spam involving engagement farming spam, fake giveaways, fake hiring posts, impersonation, crypto pumps, and more. </p>
       </div>
     </div>
   </div>
@@ -145,12 +143,12 @@
       <div class="step">
         <div class="num">5</div>
         <h3>Reason</h3>
-        <p>When you click on a badge, the content scripts requests the reasoning for the positive detection for each type. This can range from LIME, SHAP, Grad-CAM, or heatmaps depending on the detection type.</p>
+        <p>When you click on a badge, the content scripts requests the reasoning for the positive detection for each type. This can range from LIME, SHAP, Grad-CAM, and more depending on the detection type.</p>
       </div>
       <div class="step">
         <div class="num">6</div>
         <h3>Customize</h3>
-        <p>From hiding high confidence posts to custom confidence requirements for badges to appear, Investi-gator contains many adjustable settings allowing you to use Investi-gator your way.</p>
+        <p>From hiding high confidence posts to custom confidence requirements for badges to appear, Investi-gator contains many adjustable settings allowing you to use it your way.</p>
       </div>
     </div>
   </div>
@@ -159,8 +157,8 @@
 <section class="block" id="demo">
   <div class="wrap">
     <p class="eyebrow">See it in action</p>
-    <h2>Screenshots &amp; demo</h2>
-    <p class="section-lede">Below is the current state of the extension popup, badge/badge-popup, and runtime.</p>
+    <h2>Screenshots & Demo</h2>
+    <p class="section-lede">Below is the present state of the extension popup, badge/badge-popup, and settings. Currently, the extension can run on Reddit and Twitter while using localized LLMs for AI text and scam detection.</p>
     <div class="media-grid">
       <figure class="media-item wide">
         <div class="media">
@@ -192,7 +190,7 @@
 <section class="block" id="tech">
   <div class="wrap">
     <p class="eyebrow">Built with</p>
-    <h2>Tech stack</h2>
+    <h2>Tech Stack</h2>
     <p class="section-lede">
     <h4>Software:</h4>
     <div class="tech-list">
@@ -202,6 +200,7 @@
       <span class="chip">React.js</span>
       <span class="chip">Service Workers</span>
       <span class="chip">Mutation Observer</span>
+      <span class="chip">Offscreen</span>
       <span class="chip">HTML</span>
       <span class="chip">CSS</span>
     </div>
@@ -209,7 +208,7 @@
     <div class="tech-list">
       <span class="chip">Python</span>
       <span class="chip">PyTorch</span>
-      <span class="chip">HuggingFace Transformers</span>
+      <span class="chip">HuggingFace Transformers & Hub</span>
       <span class="chip">Transformers.js</span>
       <span class="chip">Scikit-learn</span>
       <span class="chip">ONNX (runtime)</span>
@@ -222,8 +221,8 @@
 <footer>
   <div class="wrap footer-inner">
     <div>
-      <div class="brand"><span class="logo">🐊🔍</span> Investi-gator</div>
-      <div class="disclaimer">Disclaimer: Investi-gator is currently deep in development. Not all features mentioned are implemented or refined yet. Design decisions and features will be subject to change.</div>
+      <div class="brand"><span class="logo">🔍🐊</span> Investi-gator</div>
+      <div class="disclaimer">Disclaimer: Investi-gator is currently deep in development. Not all features mentioned are implemented or refined yet. Design decisions and features will be subject to change. New information will be added as development progresses.</div>
       <div class="note">© <span id="year">2026</span> · Investi-gator's repository is currently private. This page serves as its public overview. Contact me if you have more questions about Investi-gator and its progress.</div>
     </div>
     <div>

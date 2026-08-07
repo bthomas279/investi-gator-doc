@@ -159,10 +159,19 @@
     <p class="eyebrow">See it in action</p>
     <h2>Screenshots & Demo</h2>
     <p class="section-lede">Below is the present state of the extension popup, badge/badge-popup, and settings. Currently, the extension can run on Reddit and Twitter while using localized LLMs for AI text and scam detection.</p>
+    <p><strong>What's New:</strong></p>
+    <ul class="section-lede-list">
+      <li>The scam detector is now on version 1.5 with an improved understanding of social media post structure and the differences between scams and advertisements/news headlines.</li> 
+      <li>AI text detection is still on version 1.0. It currently has much higher accuracy on longer posts than shorter ones.</li>
+      <li>AI text reasoning has been implemented with the sliding window algorithm for analysis. Posts must be a certain minimum length for it to run.</li>
+      <li>New settings: Users can choose which detection types to turn on and if they want to see the confidence or strength of detections.</li>
+      <li>Twitter badge UI is now in a good enough state to share.</li>
+      <li>Many bug fixes and system optimizations (caching, styling, dataflow, etc.).</li>
+    </ul> 
     <div class="media-grid">
       <figure class="media-item wide">
         <div class="media">
-          <iframe src="https://www.youtube.com/embed/CDJjE1CFp04"
+          <iframe src="https://www.youtube.com/embed/T0WW2zn9Hpw"
                 allowfullscreen loading="lazy"></iframe>
         </div>
       </figure>
@@ -176,10 +185,10 @@
       </figure>
       <figure class="media-item">
         <div class="media">
-          <img src="public/images/current_popup.png" alt="Investi-gator's popup in action">
+          <img src="public/images/current_scam_look.png" alt="Investi-gator's popup in action">
         </div>
         <figcaption class="media-caption">
-          <strong>Investi-gator's popup.</strong> Contains counters for each detection type, a toggle to quickly pause all activity, and a button to take you to the settings.
+          <strong>Investi-gator's updated scam detector.</strong> Now it doesn't usually badge unless a post actually does looks like a scam. Like this one above.
         </figcaption>
       </figure>
     </div>

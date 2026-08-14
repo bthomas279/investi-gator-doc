@@ -8,6 +8,7 @@
      features.css      → #features   (detector cards)
      how-it-works.css  → #passive    (highlight panel, mock feed) + steps
      demo.css          → #demo       (screenshot / video placeholders)
+     updates.css       → #updates    (patch notes feed + popup)
 
    Load order matters: main.css must come first, since the section files
    depend on the tokens defined below.

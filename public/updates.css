@@ -1,0 +1,417 @@
+/* ==========================================================================
+   Investi-gator — "Updates & patch notes" section (#updates)
+
+   Three pieces, in order below:
+     1. the scrollable feed and its date headers
+     2. the clickable update cards (major = thumbnail, minor = compact row)
+     3. the patch notes popup the cards open
+
+   The "What's New" block in the demo section is styled here too, since it is
+   rendered from the same update data.
+   Requires main.css (design tokens + section shell) to be loaded first.
+   ========================================================================== */
+
+/* Latest update, shown in the demo section -------------------------------- */
+.latest-update { margin: 0 0 40px; max-width: 640px; }
+
+.latest-update h3 {
+  font-size: 1.05rem;
+  margin: 0 0 4px;
+}
+
+.latest-update .latest-date {
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  margin: 0 0 12px;
+}
+
+.latest-update ul {
+  margin: 0 0 16px;
+  padding-left: 20px;
+}
+
+/* .btn was written for links, so a <button> needs these back */
+.latest-update .btn {
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.98rem;
+  cursor: pointer;
+}
+
+/* Feed --------------------------------------------------------------------
+   Capped height with its own scroll so a long history never pushes the rest
+   of the page down. The wrapper exists only to hold the bottom fade. */
+.updates-shell { position: relative; max-width: 760px; }
+
+.updates-feed {
+  max-height: 520px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 16px 20px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  scrollbar-width: thin;
+  scrollbar-color: var(--card-border) transparent;
+}
+
+.updates-feed::-webkit-scrollbar { width: 10px; }
+.updates-feed::-webkit-scrollbar-track { background: transparent; }
+
+.updates-feed::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border: 3px solid var(--bg-soft);
+  border-radius: 999px;
+}
+
+.updates-feed::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* Hint that there is more below. Never intercepts clicks or scrolls. */
+.updates-shell::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  bottom: 1px;
+  height: 44px;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: linear-gradient(to top, var(--bg-soft), transparent);
+  pointer-events: none;
+}
+
+/* Date header above each day's updates */
+.update-date {
+  margin: 22px 2px 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--card-border);
+  color: var(--text-dim);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.update-date:first-child { margin-top: 14px; }
+
+/* Update card -------------------------------------------------------------
+   A <button> so it is keyboard-reachable for free; the rules below undo the
+   default button chrome. */
+.update-card {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 0;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.update-card:last-child { margin-bottom: 0; }
+
+.update-card:hover,
+.update-card:focus-visible {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px var(--accent-glow);
+  outline: none;
+}
+
+/* Major variant: thumbnail beside the copy */
+.update-card.is-major { display: grid; grid-template-columns: 240px 1fr; }
+
+.update-thumb {
+  aspect-ratio: 16 / 9;
+  background: var(--bg-soft);
+  border-right: 1px solid var(--card-border);
+}
+
+.update-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.update-card-body { padding: 14px 18px; min-width: 0; }
+
+.update-kicker {
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* The card's title and excerpt ship as spans (a <button> only allows
+   phrasing content), so their block layout is restored here. */
+.update-card .update-title {
+  display: block;
+  margin: 3px 0 0;
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.update-excerpt {
+  margin: 7px 0 0;
+  color: var(--text-dim);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  /* Keep every card the same height no matter how long the excerpt runs. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Minor variant: icon, then kicker and title on one line */
+.update-card.is-minor {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+}
+
+.update-card.is-minor .update-icon {
+  flex: none;
+  color: var(--text-dim);
+  display: flex;
+}
+
+.update-card.is-minor .update-card-body { padding: 0; }
+
+.update-card.is-minor .update-kicker { margin-right: 8px; }
+
+.update-card.is-minor .update-title {
+  display: inline;
+  font-size: 0.96rem;
+}
+
+@media (max-width: 640px) {
+  .update-card.is-major { grid-template-columns: 1fr; }
+  .update-thumb { border-right: 0; border-bottom: 1px solid var(--card-border); }
+}
+
+/* Patch notes popup -------------------------------------------------------
+   Opened by main.js, which also sets .no-scroll on <body> while it is up. */
+.update-modal[hidden] { display: none; }
+
+.update-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.update-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(3px);
+}
+
+body.no-scroll { overflow: hidden; }
+
+.update-dialog {
+  position: relative;
+  width: min(760px, 100%);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+}
+
+/* Header stays put while the notes scroll under it */
+.update-dialog-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 20px 62px 16px 26px;
+  border-bottom: 1px solid var(--card-border);
+  background: color-mix(in srgb, var(--bg-soft) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.update-dialog-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.update-posted { color: var(--text-dim); font-size: 0.78rem; }
+
+.update-dialog-head .update-title {
+  margin: 6px 0 0;
+  font-size: clamp(1.25rem, 3vw, 1.6rem);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.update-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--card-border);
+  border-radius: 9px;
+  background: var(--card);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: color 0.12s ease, border-color 0.12s ease;
+}
+
+.update-close:hover,
+.update-close:focus-visible {
+  color: var(--text);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.update-dialog-body { padding: 22px 26px 26px; }
+
+/* The update's excerpt, reused here as the popup's opening paragraph */
+.update-lead {
+  margin: 0 0 22px;
+  color: var(--text-dim);
+  font-size: 1rem;
+}
+
+.patch-section { margin-bottom: 22px; }
+.patch-section:last-child { margin-bottom: 0; }
+
+.patch-section h4 {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+
+/* Prose inside a block, for notes that aren't a bullet list */
+.patch-section p {
+  margin: 0 0 10px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.patch-section p:last-child { margin-bottom: 0; }
+
+.patch-section ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-dim);
+}
+
+.patch-section li { margin-bottom: 7px; line-height: 1.55; }
+.patch-section li:last-child { margin-bottom: 0; }
+.patch-section li strong { color: var(--text); font-weight: 600; }
+
+/* Optional image / video inside the popup --------------------------------
+   Usually last, but a media block can sit anywhere in the notes, so the rule
+   below spaces it on both sides and only drops the trailing gap at the end. */
+.update-media {
+  margin: 26px 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--card-border);
+}
+
+.update-media:last-child { margin-bottom: 0; }
+
+/* Defaults only: a slot can override aspect-ratio, max-width, and object-fit
+   from its own data (see `ratio`, `maxWidth`, `fit` in views/updates.js),
+   which main.js writes as inline styles on that slot alone. */
+.update-media .media-frame {
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--card);
+  aspect-ratio: 16 / 9;
+}
+
+.update-media img,
+.update-media video,
+.update-media iframe {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+  object-fit: cover;
+}
+
+/* "What's Next?" panel ---------------------------------------------------
+   Closes out the popup below the media. Tinted with the accent so it reads
+   as a look ahead rather than another list of shipped changes. */
+.whats-next {
+  margin-top: 26px;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--card-border));
+  border-radius: 12px;
+  background: var(--accent-glow);
+}
+
+.whats-next h4 {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.whats-next p {
+  margin: 0 0 10px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.whats-next p:last-child { margin-bottom: 0; }
+
+.whats-next ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-dim);
+}
+
+.whats-next li { margin-bottom: 7px; line-height: 1.55; }
+.whats-next li:last-child { margin-bottom: 0; }
+.whats-next strong { color: var(--text); font-weight: 600; }
+
+.update-media figcaption {
+  margin-top: 10px;
+  color: var(--text-dim);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .update-modal { padding: 16px 12px; }
+  .update-dialog { max-height: calc(100vh - 32px); }
+  .update-dialog-head { padding: 18px 56px 14px 18px; }
+  .update-dialog-body { padding: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .update-card,
+  .update-card:hover,
+  .update-card:focus-visible {
+    transform: none;
+    transition: none;
+  }
+}

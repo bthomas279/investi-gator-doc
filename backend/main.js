@@ -97,6 +97,314 @@
     });
   }
 
+  /* Update log -----------------------------------------------------------
+     Renders the patch notes feed (#updates), the "What's New" summary in the
+     demo section, and the popup both of them open. Everything comes from
+     window.UPDATES (see views/updates.js), so the page never holds a second
+     copy of an update's text. */
+
+  // Update text is ours, not user input, but it still goes through escaping
+  // so an ampersand or angle bracket in a patch note can't break the markup.
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  // Escape first, then allow **bold** as the one bit of inline formatting.
+  function inlineText(str) {
+    return escapeHtml(str).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  }
+
+  // Built from parts on purpose: new Date("2026-08-07") is parsed as UTC and
+  // can land on the previous day for anyone west of Greenwich.
+  function parseDate(iso) {
+    var parts = String(iso).split("-");
+    return new Date(+parts[0], +parts[1] - 1, +parts[2]);
+  }
+
+  function formatDate(iso, withWeekday) {
+    var options = { year: "numeric", month: "long", day: "numeric" };
+    if (withWeekday) options.weekday = "short";
+    return parseDate(iso).toLocaleDateString(undefined, options);
+  }
+
+  var WRENCH_ICON =
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"' +
+    ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M14.7 6.3a4 4 0 0 0 5 5L21 21l-3 0-9.6-9.6a4 4 0 0 1-5-5L6 3l3.7 3.7 2.6-2.6z"/>' +
+    "</svg>";
+
+  function updateCardMarkup(update, index) {
+    var kicker = update.kicker
+      ? '<span class="update-kicker">' + escapeHtml(update.kicker) + "</span>"
+      : "";
+    // Spans rather than <h3>/<p>: a <button> may only contain phrasing
+    // content, and updates.css gives these back their block layout.
+    var title = '<span class="update-title">' + escapeHtml(update.title) + "</span>";
+
+    if (update.type === "minor") {
+      return (
+        '<button class="update-card is-minor" type="button" data-update="' + index + '">' +
+        '<span class="update-icon" aria-hidden="true">' + WRENCH_ICON + "</span>" +
+        '<span class="update-card-body">' + kicker + title + "</span>" +
+        "</button>"
+      );
+    }
+
+    var thumb = update.thumb
+      ? '<span class="update-thumb"><img src="' + escapeHtml(update.thumb.src) +
+        '" alt="' + escapeHtml(update.thumb.alt || "") + '" loading="lazy"></span>'
+      : "";
+    var excerpt = update.excerpt
+      ? '<span class="update-excerpt">' + inlineText(update.excerpt) + "</span>"
+      : "";
+
+    return (
+      '<button class="update-card is-major" type="button" data-update="' + index + '">' +
+      thumb +
+      '<span class="update-card-body">' + kicker + title + excerpt + "</span>" +
+      "</button>"
+    );
+  }
+
+  // One header per day, then that day's cards beneath it — same shape as the
+  // update lists the popup is modeled on.
+  function renderUpdatesFeed(feed, updates) {
+    var html = "";
+    var lastDate = null;
+
+    updates.forEach(function (update, index) {
+      if (update.date !== lastDate) {
+        html += '<p class="update-date">' + escapeHtml(formatDate(update.date)) + "</p>";
+        lastDate = update.date;
+      }
+      html += updateCardMarkup(update, index);
+    });
+
+    feed.innerHTML = html;
+  }
+
+  /* The demo section's "What's New" block: the newest entry, summarized. */
+  function renderLatestUpdate(host, update, index) {
+    var items = (update.sections || []).reduce(function (all, section) {
+      return all.concat(section.items || []);
+    }, []);
+
+    host.innerHTML =
+      "<h3>What's New: " + escapeHtml(update.title) + "</h3>" +
+      '<p class="latest-date">' + escapeHtml(formatDate(update.date)) + "</p>" +
+      '<ul class="section-lede-list">' +
+      items
+        .map(function (item) {
+          return "<li>" + inlineText(item) + "</li>";
+        })
+        .join("") +
+      "</ul>" +
+      '<button class="btn btn-ghost" type="button" data-update="' + index + '">' +
+      "Read the full patch notes →</button>";
+  }
+
+  // Sizing values come from our own data file, but they land inside a style
+  // attribute, so anything outside a plain CSS value is dropped rather than
+  // written through.
+  function safeCssValue(value) {
+    var text = String(value == null ? "" : value).trim();
+    return /^[\w\s.,%/()#-]+$/.test(text) ? text : "";
+  }
+
+  function styleAttr(declarations) {
+    var css = declarations
+      .filter(function (pair) {
+        return pair[1];
+      })
+      .map(function (pair) {
+        return pair[0] + ":" + pair[1];
+      })
+      .join(";");
+
+    return css ? ' style="' + css + '"' : "";
+  }
+
+  /* A media slot. The frame is 16:9 with the image cropped to fill, which
+     suits a screenshot but not, say, a wide strip of metrics — so `ratio`,
+     `fit`, and `maxWidth` can retune any single slot. They are written as
+     inline styles on that slot alone, so every other image keeps the
+     defaults from updates.css. */
+  function updateMediaMarkup(media) {
+    if (!media || !media.src) return "";
+
+    var frameStyle = styleAttr([
+      ["aspect-ratio", safeCssValue(media.ratio)],
+      ["max-width", safeCssValue(media.maxWidth)],
+    ]);
+    // object-fit has no effect on an iframe, so embeds only take the frame.
+    var fitStyle = styleAttr([["object-fit", safeCssValue(media.fit)]]);
+
+    var element;
+    if (media.kind === "video") {
+      element =
+        "<video controls preload=\"metadata\"" +
+        (media.poster ? ' poster="' + escapeHtml(media.poster) + '"' : "") +
+        ' src="' + escapeHtml(media.src) + '"' + fitStyle + "></video>";
+    } else if (media.kind === "embed") {
+      element =
+        '<iframe src="' + escapeHtml(media.src) +
+        '" title="' + escapeHtml(media.title || "Update video") +
+        '" allowfullscreen loading="lazy"></iframe>';
+    } else {
+      element =
+        '<img src="' + escapeHtml(media.src) +
+        '" alt="' + escapeHtml(media.alt || "") + '" loading="lazy"' + fitStyle + ">";
+    }
+
+    return (
+      '<figure class="update-media">' +
+      '<div class="media-frame"' + frameStyle + ">" + element + "</div>" +
+      (media.caption ? "<figcaption>" + inlineText(media.caption) + "</figcaption>" : "") +
+      "</figure>"
+    );
+  }
+
+  /* The prose and bullets of a notes block, without its wrapper. Shared by
+     the patch notes themselves and the "What's Next?" panel. */
+  function notesMarkup(block) {
+    // `text` takes one paragraph or several.
+    var paragraphs = block.text ? [].concat(block.text) : [];
+    var items = block.items || [];
+
+    return (
+      paragraphs
+        .map(function (paragraph) {
+          return "<p>" + inlineText(paragraph) + "</p>";
+        })
+        .join("") +
+      (items.length
+        ? "<ul>" +
+          items
+            .map(function (item) {
+              return "<li>" + inlineText(item) + "</li>";
+            })
+            .join("") +
+          "</ul>"
+        : "")
+    );
+  }
+
+  /* One block of a popup's body. A block is either a media slot or a run of
+     notes (heading, prose, bullets — each optional), so an update can keep
+     writing below an image or video simply by listing another block after
+     the media one. */
+  function updateBlockMarkup(block) {
+    if (!block) return "";
+    if (block.media) return updateMediaMarkup(block.media);
+
+    return (
+      '<div class="patch-section">' +
+      (block.heading ? "<h4>" + escapeHtml(block.heading) + "</h4>" : "") +
+      notesMarkup(block) +
+      "</div>"
+    );
+  }
+
+  /* "What's Next?" — the work in progress, closing out the popup below the
+     media. Written as a plain string (one paragraph), an array of strings
+     (bullets), or the full { heading, text, items } block. */
+  function whatsNextMarkup(whatsNext) {
+    if (!whatsNext) return "";
+
+    var block = whatsNext;
+    if (typeof whatsNext === "string") block = { text: whatsNext };
+    else if (Array.isArray(whatsNext)) block = { items: whatsNext };
+
+    var body = notesMarkup(block);
+    if (!body) return "";
+
+    return (
+      '<div class="whats-next">' +
+      "<h4>" + escapeHtml(block.heading || "What's Next?") + "</h4>" +
+      body +
+      "</div>"
+    );
+  }
+
+  function initUpdates() {
+    var updates = window.UPDATES;
+    if (!updates || !updates.length) return;
+
+    var feed = document.getElementById("updates-feed");
+    var latest = document.getElementById("latest-update");
+    var modal = document.getElementById("update-modal");
+
+    if (feed) renderUpdatesFeed(feed, updates);
+    if (latest) renderLatestUpdate(latest, updates[0], 0);
+    if (!modal) return;
+
+    var dialog = modal.querySelector(".update-dialog");
+    var head = modal.querySelector(".update-dialog-meta");
+    var titleEl = modal.querySelector("#update-modal-title");
+    var body = modal.querySelector(".update-dialog-body");
+    var closeBtn = modal.querySelector(".update-close");
+    var lastFocused = null;
+
+    function open(update) {
+      head.innerHTML =
+        (update.kicker
+          ? '<span class="update-kicker">' + escapeHtml(update.kicker) + "</span>"
+          : "") +
+        '<span class="update-posted">Posted ' +
+        escapeHtml(formatDate(update.date, true)) +
+        "</span>";
+
+      titleEl.textContent = update.title;
+
+      // The excerpt does double duty: preview text on the card, and the
+      // opening paragraph the popup leads with.
+      body.innerHTML =
+        (update.excerpt ? '<p class="update-lead">' + inlineText(update.excerpt) + "</p>" : "") +
+        (update.sections || []).map(updateBlockMarkup).join("") +
+        // Shorthand for the common case: media last, no block needed.
+        updateMediaMarkup(update.media) +
+        // Always last, so it closes the popup out below any media.
+        whatsNextMarkup(update.whatsNext);
+
+      lastFocused = document.activeElement;
+      modal.hidden = false;
+      document.body.classList.add("no-scroll");
+      dialog.scrollTop = 0;
+      closeBtn.focus();
+    }
+
+    function close() {
+      if (modal.hidden) return;
+      modal.hidden = true;
+      document.body.classList.remove("no-scroll");
+      // Stop any video that was left playing inside the popup.
+      body.innerHTML = "";
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    // One delegated listener covers the feed cards and the demo section's
+    // "read the full patch notes" button, including cards added later.
+    document.addEventListener("click", function (event) {
+      if (!event.target || !event.target.closest) return;
+
+      var trigger = event.target.closest("[data-update]");
+      if (trigger) {
+        var update = updates[+trigger.dataset.update];
+        if (update) open(update);
+        return;
+      }
+      if (event.target.closest(".update-close, .update-modal-backdrop")) close();
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") close();
+    });
+  }
+
   /* Current year in the footer ------------------------------------------- */
   function initYear() {
     var el = document.getElementById("year");
@@ -105,6 +413,7 @@
 
   function init() {
     initDetectionBadges();
+    initUpdates();
     initScrollReveal();
     initActiveNav();
     initYear();

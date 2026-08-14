@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="public/features.css" />
 <link rel="stylesheet" href="public/how-it-works.css" />
 <link rel="stylesheet" href="public/demo.css" />
+<link rel="stylesheet" href="public/updates.css" />
 </head>
 <body>
 
@@ -20,6 +21,7 @@
       <a href="#features">Features</a>
       <a href="#passive">How it works</a>
       <a href="#demo">Demo</a>
+      <a href="#updates">Updates</a>
       <a href="#tech">Tech</a>
     </div>
   </div>
@@ -159,15 +161,12 @@
     <p class="eyebrow">See it in action</p>
     <h2>Screenshots & Demo</h2>
     <p class="section-lede">Below is the present state of the extension popup, badge/badge-popup, and settings. Currently, the extension can run on Reddit and Twitter while using localized LLMs for AI text and scam detection.</p>
-    <p><strong>What's New:</strong></p>
-    <ul class="section-lede-list">
-      <li>The scam detector is now on version 1.5 with an improved understanding of social media post structure and the differences between scams and advertisements/news headlines.</li> 
-      <li>AI text detection is still on version 1.0. It currently has much higher accuracy on longer posts than shorter ones.</li>
-      <li>AI text reasoning has been implemented with the sliding window algorithm for analysis. Posts must be a certain minimum length for it to run.</li>
-      <li>New settings: Users can choose which detection types to turn on and if they want to see the confidence or strength of detections.</li>
-      <li>Twitter badge UI is now in a good enough state to share.</li>
-      <li>Many bug fixes and system optimizations (caching, styling, dataflow, etc.).</li>
-    </ul> 
+    <!-- Filled in by main.js from the newest entry in views/updates.js, so the
+         most recent update is described in exactly one place. -->
+    <div class="latest-update" id="latest-update"></div>
+    <noscript>
+      <p class="section-lede">Enable JavaScript to see the latest update details and the full patch notes.</p>
+    </noscript>
     <div class="media-grid">
       <figure class="media-item wide">
         <div class="media">
@@ -194,6 +193,40 @@
     </div>
   </div>
 </section>
+
+<!--Update log. Cards and popup contents both come from views/updates.js-->
+<section class="block" id="updates">
+  <div class="wrap">
+    <p class="eyebrow">Changelog</p>
+    <h2>Updates & Patch Notes</h2>
+    <p class="section-lede">
+      Every update to Investi-gator, newest first. Click any entry to read its full patch notes.
+    </p>
+    <div class="updates-shell">
+      <div class="updates-feed" id="updates-feed"></div>
+    </div>
+  </div>
+</section>
+
+<!--Patch notes popup. Opened by main.js when an update card is clicked-->
+<div class="update-modal" id="update-modal" role="dialog" aria-modal="true"
+     aria-labelledby="update-modal-title" hidden>
+  <div class="update-modal-backdrop"></div>
+  <div class="update-dialog">
+    <div class="update-dialog-head">
+      <div class="update-dialog-meta"></div>
+      <h3 class="update-title" id="update-modal-title"></h3>
+      <button class="update-close" type="button" aria-label="Close patch notes">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round">
+          <line x1="6" y1="6" x2="18" y2="18" />
+          <line x1="18" y1="6" x2="6" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="update-dialog-body"></div>
+  </div>
+</div>
 
 <section class="block" id="tech">
   <div class="wrap">
@@ -239,8 +272,10 @@
   </div>
 </footer>
 
-<!-- Badge data must load before main.js, which reads BADGE_STYLES off the global. -->
+<!-- Data files must load before main.js, which reads BADGE_STYLES and UPDATES
+     off the global. -->
 <script src="views/detection-styles.js"></script>
+<script src="views/updates.js"></script>
 <script src="backend/main.js"></script>
 </body>
 </html>

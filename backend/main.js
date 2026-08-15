@@ -131,10 +131,16 @@
     return parseDate(iso).toLocaleDateString(undefined, options);
   }
 
-  var WRENCH_ICON =
-    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"' +
-    ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
-    '<path d="M14.7 6.3a4 4 0 0 0 5 5L21 21l-3 0-9.6-9.6a4 4 0 0 1-5-5L6 3l3.7 3.7 2.6-2.6z"/>' +
+  // Gator head in profile, jaws open. Filled rather than stroked on purpose:
+  // at this size an outline of a long snout closes up into a blob, while a
+  // solid silhouette keeps its shape. The eye is knocked out of the upper jaw
+  // by the evenodd fill rule, so it shows the card behind it at any color.
+  var GATOR_ICON =
+    '<svg width="20" height="20" viewBox="0 0 24 24">' +
+    '<path fill="currentColor" fill-rule="evenodd" d="M2.3 10C2.3 6.3 4.6 3.8 8 3.8c2.4 0' +
+    " 4.2 1.5 5 3.7l7.7 1.9c1.8.4 1.8 2.5 0 2.8l-18.4.7Z" +
+    'M9.2 8.6a1.45 1.45 0 1 0-2.9 0 1.45 1.45 0 1 0 2.9 0Z"/>' +
+    '<path fill="currentColor" d="M4.3 14.9l16.4 1.9c1.6.2 1.6 2.5 0 2.7l-11.6 1c-3.1.3-4.8-1.8-4.8-4.1Z"/>' +
     "</svg>";
 
   function updateCardMarkup(update, index) {
@@ -148,7 +154,7 @@
     if (update.type === "minor") {
       return (
         '<button class="update-card is-minor" type="button" data-update="' + index + '">' +
-        '<span class="update-icon" aria-hidden="true">' + WRENCH_ICON + "</span>" +
+        '<span class="update-icon" aria-hidden="true">' + GATOR_ICON + "</span>" +
         '<span class="update-card-body">' + kicker + title + "</span>" +
         "</button>"
       );
@@ -187,22 +193,12 @@
     feed.innerHTML = html;
   }
 
-  /* The demo section's "What's New" block: the newest entry, summarized. */
+  /* The demo section's "What's New" block: title and date only, with the
+     details left to the popup the button opens. */
   function renderLatestUpdate(host, update, index) {
-    var items = (update.sections || []).reduce(function (all, section) {
-      return all.concat(section.items || []);
-    }, []);
-
     host.innerHTML =
       "<h3>What's New: " + escapeHtml(update.title) + "</h3>" +
       '<p class="latest-date">' + escapeHtml(formatDate(update.date)) + "</p>" +
-      '<ul class="section-lede-list">' +
-      items
-        .map(function (item) {
-          return "<li>" + inlineText(item) + "</li>";
-        })
-        .join("") +
-      "</ul>" +
       '<button class="btn btn-ghost" type="button" data-update="' + index + '">' +
       "Read the full patch notes →</button>";
   }

@@ -238,17 +238,6 @@ h2 {
   margin: 0 0 40px;
 }
 
-.section-lede-list li {
-  color: var(--text-dim);
-  max-width: 640px;
-  font-size: 1.05rem;
-  margin-bottom: 8px; /* small, sane spacing between bullets */
-}
-
-.section-lede-list li:last-child {
-  margin-bottom: 0;
-}
-
 
 /* Tech list --------------------------------------------------------------
    Small enough to stay here rather than warrant its own file. */

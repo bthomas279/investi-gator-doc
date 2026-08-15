@@ -22,12 +22,7 @@
 .latest-update .latest-date {
   color: var(--text-dim);
   font-size: 0.82rem;
-  margin: 0 0 12px;
-}
-
-.latest-update ul {
   margin: 0 0 16px;
-  padding-left: 20px;
 }
 
 /* .btn was written for links, so a <button> needs these back */

@@ -129,8 +129,8 @@ var UPDATES = [
       },
       {
         text:
-          "As you can maybe tell, it didn't perform too well. Turns out the LLM is extremely overconfident. To make a long story short, it naturally had a much higher confidence threshold so the line between a AI and human dection " +
-          "was very thin and high (ex: 0.998...). That basically caused a lot of human posts to be labels as AI since the threshold line was much lower (0.5).",
+          "As you can maybe tell, it didn't perform too well. Turns out the LLM is extremely overconfident. To make a long story short, it naturally has a much higher confidence threshold so the line between an AI and human detection " +
+          "isvery thin and high (ex: 0.998...). That basically caused a lot of human posts to be labeled5 as AI since the threshold line was much lower (0.5).",
       },
       {
         text:

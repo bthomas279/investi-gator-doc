@@ -129,13 +129,13 @@ var UPDATES = [
       },
       {
         text:
-          "As you can maybe tell, it didn't perform too well. Turns out the LLM is extremely overconfident. To make a long story short, it naturally has a much higher confidence threshold so the line between an AI and human detection " +
-          "isvery thin and high (ex: 0.998...). That basically caused a lot of human posts to be labeled5 as AI since the threshold line was much lower (0.5).",
+          "As you can tell, it didn't perform too well. Turns out the LLM is extremely overconfident. To make a long story short, it naturally has a much higher confidence threshold for both positive and negative cases. This makes the line between an AI and human detection " +
+          "very thin and high (ex: 0.998...). That causes a lot of human posts to be labeled as AI since the threshold line was much lower (0.5).",
       },
       {
         text:
           "While I can't figure out exactly why the model is so overconfident, it's likely due to the " +
-          "lack of diversity in its training data. Since it was trained mainly on MAGE and a bit of RAID, it probably got too familiar with that data structure.",
+          "lack of diversity in V1's training data. Since it was trained mainly on the MAGE and RAID datasets, it probably got too familiar with that data structure early on.",
       },
       {
         text:
@@ -148,7 +148,7 @@ var UPDATES = [
           src: "public/images/ai-text-v1-6.36.png",
           alt: "Investi-gator's AI-Text Detector OOD Eval in 6.36 margin",
           caption:
-            "New OOD metrics with a margin threshold of 6.36. While the false negative ratio increased, I believe the new fpr is more than worth it.",
+            "New OOD metrics with a margin threshold of 6.36. While the false negative ratio (fnr) increased, I believe the new fpr is more than worth it.",
           // The image is a wide 1331x208 strip, so it gets its own frame
           // shape instead of being cropped into the default 16:9 one.
           ratio: "1331 / 208",

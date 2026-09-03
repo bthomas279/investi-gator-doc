@@ -25,6 +25,7 @@
                too compact to show it, but the popup still leads with it.
      sections  The notes themselves, in the order they should appear
      media     Shorthand for a single image / video at the very bottom
+     table     Shorthand for a single table at the very bottom (after media)
      whatsNext What you're working on now. Rendered last, below the media, in
                its own highlighted panel. Write it as a plain string (one
                paragraph), an array of strings (bullets), or the full block
@@ -32,12 +33,13 @@
                heading needs changing. Leave it out and no panel appears.
 
    SECTIONS
-   `sections` is an ordered list of blocks. A block is either a run of notes
-   or a piece of media, so writing can continue below an image or video:
+   `sections` is an ordered list of blocks. A block is either a run of notes,
+   a piece of media, or a table, so writing can continue below any of them:
 
      sections: [
        { heading: 'Balance', items: ['...', '...'] },
        { media: { kind: 'image', src: '...', caption: '...' } },
+       { table: { headers: ['...', '...'], rows: [['...', '...']] } },
        { heading: 'Known issues', text: 'Still shaking these out.' },
      ]
 
@@ -72,21 +74,36 @@
 
    The wide metrics strip in the first entry below shows the pair in use.
 
-   Inside `excerpt`, `text`, `items`, `whatsNext`, and captions, wrap text in **double
-   asterisks** to bold it. Everything else is escaped, so angle brackets and
-   ampersands are safe to type literally.
+   TABLES
+   A table block, and the top-level `table` shorthand, take:
+
+     { table: { headers: ["Metric", "V1", "V2"],
+                rows: [["FPR", "12%", "4%"], ["FNR", "8%", "6%"]],
+                caption: "...", maxWidth: "..." } }
+
+   `headers` is optional — leave it out for a headerless table. `rows` is a
+   list of rows, each a list of cell strings in column order; every row
+   should have the same number of cells as `headers` (when given). `caption`
+   and `maxWidth` behave the same as they do on a media slot. Wide tables
+   scroll horizontally inside the popup rather than overflowing it.
+
+   Inside `excerpt`, `text`, `items`, `whatsNext`, table cells, and captions,
+   wrap text in **double asterisks** to bold it. Everything else is escaped,
+   so angle brackets and ampersands are safe to type literally.
    ---------------------------------------------------------------------------
 
    @typedef {{ kind: "image" | "video" | "embed", src: string, alt?: string,
                poster?: string, title?: string, caption?: string,
                ratio?: string, fit?: "cover" | "contain",
                maxWidth?: string }} UpdateMedia
+   @typedef {{ headers?: string[], rows: string[][], caption?: string,
+               maxWidth?: string }} UpdateTable
    @typedef {{ heading?: string, text?: string | string[], items?: string[],
-               media?: UpdateMedia }} PatchBlock
+               media?: UpdateMedia, table?: UpdateTable }} PatchBlock
    @typedef {{ type: "major" | "minor", kicker?: string, title: string,
                date: string, thumb?: { src: string, alt?: string },
                excerpt?: string, sections?: PatchBlock[],
-               media?: UpdateMedia,
+               media?: UpdateMedia, table?: UpdateTable,
                whatsNext?: string | string[] | PatchBlock }} Update
    @type {Update[]}
    ========================================================================== */
@@ -95,31 +112,73 @@ var UPDATES = [
     type: "major",
     kicker: "Major Update",
     title: "V2 AI-Text Training, Implementation, Results, and Test Run",
-    date: "2026-09-02",
-     thumb: {
+    date: "2026-09-04",
+    thumb: {
       src: "public/images/steam-example.png",
-      alt: "A post badged by the updated scam detector",
+      alt: "Picture of AI-text V2",
       ratio: "1300 / 400",
     },
     excerpt:
-      "It took a long time, but Version 2 of the AI Text detector has finally been trained and tested. This model version is by far the one I spent the most time optimizing. I've been very thoughful on the types of data I should use for training, and while I definitely think it's a step up from V1, it still needs further tweaking. " +
+      "It took a long time, but Version 2 of the AI Text detector has finally been trained and tested. This model version is by far the one I spent the most time optimizing. " +
+      "While it still needs further tweaking, it's a step up compared to V1." +
       "",
     sections: [
-      
       {
         heading: "Datasets:",
-        text: 
-          "Like I mentioned in the past, I wanted V2 to tackle a lot of the issues present in V1. Below are the datasets I used and their OODs",
-        items: [
-          "Webis: (Reddit posts pre 2020)",
-          "Kai: (Twitter posts pre 2020)",
-          "MAGE",
-          "RAID",
-          "lmarena-expert: (prompt responses to expert topics + 2025 AI models)",
-          "lmarena-human-preference: (prompt responses to general topics + 2025 AI models)",
-          "Gsingh: (News Articles with more recent AI models)",
-          "Beemo: (human and ai responses to prompts + AI -> human paraphrasing)",
-        ],
+        text: "Like I mentioned in the past, I wanted V2 to tackle a lot of the issues present in V1. I've been very thoughful on the types of data I should use for training. Below are the datasets I used and their OODs:",
+      },
+      {
+        table: {
+          caption:
+            "Positive classifications on the same reddit/twitter cross-reference sample.",
+          headers: ["Dataset", "Contents", "OOD"],
+          rows: [
+            [
+              "Webis",
+              "Reddit posts pre 2020",
+              "Posts from 30+ untrained subreddits",
+            ],
+            [
+              "Kai",
+              "Twitter posts pre 2020",
+              "1000 Twitter posts of varying topics ",
+            ],
+            [
+              "MAGE",
+              "General text vs AI test of same topic",
+              "Official MAGE dataset OODs (regular + paraphrased)",
+            ],
+            [
+              "RAID",
+              "Human & AI prompt answers",
+              "Untrained domain and model",
+            ],
+            [
+              "lmarena-expert",
+              "Prompt responses from AI on expert topics + 2025 AI models",
+              "An untrained model",
+            ],
+            [
+              "lmarena-human-preference",
+              "Prompt responses from AI to general topics + 2025 AI models",
+              "An untrained model",
+            ],
+            ["Gsingh", "AI & human generated news articles/stories", "N/A"],
+            [
+              "Beemo",
+              "Human/AI reponses to prompts & AI -> human paraphrasing",
+              "An untrained model",
+            ],
+            [
+              "Sythetic data", 
+              "AI & human sounding posts generated by multiple AIs (Claude, Gemini, Grok, Deepseek)",
+              "Mutiple untrained models from certain areas (AI sounding: Claude Haiku 4.5, human sounding: Grok)"
+            ],
+          ],
+        },
+      },
+      {
+        text: "Data diversity was a high priority. Below are the OOD results of V2."
       },
       {
         media: {
@@ -139,13 +198,12 @@ var UPDATES = [
 
       {
         heading: "My Thoughts:",
-        text: 
-          "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with published and widely known AI text detectors." + 
+        text:
+          "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with published and widely known AI text detectors." +
           "I did the same thing here when testing on reddit and twitter. When comparing GPTZero and ACE with V2, V2 had the same postive classifications as then 3/4 of the positive classifications I cross referenced. I could only cross reference longer posts, but from the looks of it, V2 can predict AI text much more accurately in the field than V1. Not bad at all.",
       },
       {
-        text: 
-          "With the new detector, AI text reasoning naturally experienced improved analysis and reasoning. When running V2, reasoning tends to be more defined, make it easier to figure out what parts of text are heavily influencing positive classification.  ",
+        text: "With the new detector, AI text reasoning naturally experienced improved analysis and reasoning. When running V2, reasoning tends to be more defined, make it easier to figure out what parts of text are heavily influencing positive classification.  ",
       },
       {
         media: {
@@ -161,17 +219,14 @@ var UPDATES = [
         heading: "Issues and Bias:",
         text: "While I was testing the model on social media there were a few things that I noticed early on that need to be addresses in future versions:",
         items: [
-           "V2 is still overconfident despite the data diversity. I still need to do further fixes, and I'm planning on doing another fine-tuning session with a higher weight decay. If that winds up failing I will have to change the confidence system.",
-           "Since both the lmarena datasets included some rows with math symbols and equations in them, simpily having math in a post can cause V2 to lean to AI.",
-           "Based on the OOD testing results there's a chance V2 is assuming that long posts = AI. I didn't really notice that during initial testing, but if that's true I'll have to add long human data to training.",
+          "V2 is still overconfident despite the data diversity. I still need to do further fixes, and I'm planning on doing another fine-tuning session with a higher weight decay. If that winds up failing I will have to change the confidence system.",
+          "Since both the lmarena datasets included some rows with math symbols and equations in them, simpily having math in a post can cause V2 to lean to AI.",
+          "Based on the OOD testing results there's a chance V2 is assuming that long posts = AI. I didn't really notice that during initial testing, but if that's true I'll have to add long human data to training.",
           "There might also be a potential problem with V2 and certain writing styles (such as the way Nintendo advertises things on twitter and in Nintendo Directs). If you keep up with video games you may know what I'm talking about." +
-          "I don't know why, I don't know how, but the styling and wording used constantly by Nintendo (and sometimes other gaming companies) always alert my AI detectors. This was an issue with V1 too. From what I've seen, it has nothing to do with the topics or content itself; it's specifically about the wording and communication methodology.",
-        ]
-       
+            "I don't know why, I don't know how, but the styling and wording used constantly by Nintendo (and sometimes other gaming companies) always alert my AI detectors. This was an issue with V1 too. From what I've seen, it has nothing to do with the topics or content itself; it's specifically about the wording and communication methodology.",
+        ],
       },
-
-     
-    ]
+    ],
   },
   {
     type: "minor",

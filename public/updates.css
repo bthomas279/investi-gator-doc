@@ -395,7 +395,80 @@ body.no-scroll { overflow: hidden; }
   line-height: 1.5;
 }
 
+/* Optional table inside the popup -----------------------------------------
+   Same slot rules as .update-media: sits anywhere in the notes, spaced on
+   both sides, no trailing gap at the very end. The side margins inset it
+   from the popup's edges so a wide table reads as sitting inside the notes
+   rather than running off them. */
+.update-table {
+  margin: 26px 12px;
+  padding-top: 22px;
+  border-top: 1px solid var(--card-border);
+}
+
+.update-table:last-child { margin-bottom: 0; }
+
+/* Never wider than the notes column: the table wraps its cell text to fit,
+   and this still scrolls as a fallback for a table with enough columns that
+   even wrapped text can't be squeezed in. */
+.update-table .table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+}
+
+.update-table table {
+  width: 100%;
+  /* Fixed layout keeps one long cell from stretching the whole table past
+     the popup — columns share the available width instead. */
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.update-table th,
+.update-table td {
+  padding: 10px 14px;
+  text-align: left;
+  /* Wrap rather than run off the edge; break only words with no space in
+     them (a long URL or path) so ordinary prose still breaks at spaces. */
+  overflow-wrap: break-word;
+  vertical-align: top;
+}
+
+.update-table th {
+  color: var(--text);
+  font-weight: 700;
+  background: var(--card-border);
+}
+
+.update-table td {
+  color: var(--text-dim);
+  border-top: 1px solid var(--card-border);
+}
+
+.update-table td strong { color: var(--text); font-weight: 600; }
+
+.update-table tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--card-border) 35%, transparent);
+}
+
+.update-table figcaption {
+  margin-top: 10px;
+  color: var(--text-dim);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
 @media (max-width: 640px) {
+  /* Tighter cells so a three-column table still has room to wrap sanely
+     once the popup is only a phone wide. */
+  .update-table { margin-left: 4px; margin-right: 4px; }
+  .update-table table { font-size: 0.82rem; }
+  .update-table th,
+  .update-table td { padding: 8px 10px; }
+
   .update-modal { padding: 16px 12px; }
   .update-dialog { max-height: calc(100vh - 32px); }
   .update-dialog-head { padding: 18px 56px 14px 18px; }

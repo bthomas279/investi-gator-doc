@@ -264,6 +264,52 @@
     );
   }
 
+  /* A table slot, same shape as the media one: a figure with an optional
+     caption, sized with `maxWidth` alone since a table's own columns set its
+     height. Wrapped in a scroll container so a wide table doesn't blow out
+     the popup on narrow screens. */
+  function tableMarkup(table) {
+    if (!table || !table.rows || !table.rows.length) return "";
+
+    var frameStyle = styleAttr([["max-width", safeCssValue(table.maxWidth)]]);
+    var headers = table.headers || [];
+
+    // Every row is padded out to the widest one so a row written with a cell
+    // or two missing still gets its full set of borders and stripes rather
+    // than stopping short mid-table.
+    var columns = table.rows.reduce(function (widest, row) {
+      return Math.max(widest, row.length);
+    }, headers.length);
+
+    function cells(tag, row) {
+      var html = "";
+      for (var i = 0; i < columns; i++) {
+        html += "<" + tag + ">" + inlineText(row[i] == null ? "" : row[i]) + "</" + tag + ">";
+      }
+      return "<tr>" + html + "</tr>";
+    }
+
+    var head = headers.length ? "<thead>" + cells("th", headers) + "</thead>" : "";
+
+    var body =
+      "<tbody>" +
+      table.rows
+        .map(function (row) {
+          return cells("td", row);
+        })
+        .join("") +
+      "</tbody>";
+
+    return (
+      '<figure class="update-table">' +
+      '<div class="table-scroll"' + frameStyle + ">" +
+      "<table>" + head + body + "</table>" +
+      "</div>" +
+      (table.caption ? "<figcaption>" + inlineText(table.caption) + "</figcaption>" : "") +
+      "</figure>"
+    );
+  }
+
   /* The prose and bullets of a notes block, without its wrapper. Shared by
      the patch notes themselves and the "What's Next?" panel. */
   function notesMarkup(block) {
@@ -296,6 +342,7 @@
   function updateBlockMarkup(block) {
     if (!block) return "";
     if (block.media) return updateMediaMarkup(block.media);
+    if (block.table) return tableMarkup(block.table);
 
     return (
       '<div class="patch-section">' +
@@ -361,9 +408,10 @@
       body.innerHTML =
         (update.excerpt ? '<p class="update-lead">' + inlineText(update.excerpt) + "</p>" : "") +
         (update.sections || []).map(updateBlockMarkup).join("") +
-        // Shorthand for the common case: media last, no block needed.
+        // Shorthand for the common case: media/table last, no block needed.
         updateMediaMarkup(update.media) +
-        // Always last, so it closes the popup out below any media.
+        tableMarkup(update.table) +
+        // Always last, so it closes the popup out below any media/table.
         whatsNextMarkup(update.whatsNext);
 
       lastFocused = document.activeElement;

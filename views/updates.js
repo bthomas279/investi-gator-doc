@@ -91,9 +91,85 @@
    @type {Update[]}
    ========================================================================== */
 var UPDATES = [
-  /* EXAMPLE — shows what a small update looks like in the feed, and how a
-     block can keep the notes going below an image. Delete this entry once
-     there is a real one to take its place. */
+  {
+    type: "major",
+    kicker: "Major Update",
+    title: "V2 AI-Text Training, Implementation, Results, and Test Run",
+    date: "2026-09-02",
+     thumb: {
+      src: "public/images/steam-example.png",
+      alt: "A post badged by the updated scam detector",
+      ratio: "1500 / 400",
+    },
+    excerpt:
+      "It took a long time, but Version 2 of the AI Text detector has finally been trained and tested. This model version is by far the one I spent the most time optimizing. I've been very thoughful on the types of data I should use for training, and while I definitely think it's a step up from V1, it still needs further tweaking. " +
+      "",
+    sections: [
+      
+      {
+        heading: "Datasets:",
+        text: 
+          "Like I mentioned in the past, I wanted V2 to tackle a lot of the issues present in V1.",
+        items: [
+          "Datasets on posts prior to 2020 (Webis, Kai)",
+          "",
+          "OOD datasets from some authors of the training data (ood_mage_gpt, ood_mage_gpt_para)",
+          "data from more recent models (ood_gsingh)",
+          "cut-out domains/models not included in training (ood_raid_llama, ood_raid_reviews)",
+        ],
+      },
+      {
+        media: {
+          kind: "image",
+          src: "public/images/v2-text-ood-0.5.png",
+          alt: "Investi-gator's AI-Text Detector OOD Eval in 0.5 threshold",
+          caption: "OOD metrics with a threshold of 0.5.",
+          ratio: "1331 / 400",
+          fit: "contain",
+        },
+      },
+      {
+        text:
+          "The metrics are a bit messy at the moment. There were slight improvements in the meterics for oods that were used " +
+          "when testing V1 (aside from MAGE), and it seems that V2 was able to absorb some of the patterns I hoped it would. ",
+      },
+
+      {
+        heading: "My Thoughts:",
+        text: 
+          "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with published and widely known AI text detectors." + 
+          "I did the same thing here when testing on reddit and twitter. When comparing GPTZero and ACE with V2, V2 had the same postive classifications as then 3/4 of the positive classifications I cross referenced. I could only cross reference longer posts, but from the looks of it, V2 can predict AI text much more accurately in the field than V1. Not bad at all.",
+      },
+      {
+        text: 
+          "With the new detector, AI text reasoning naturally experienced improved analysis and reasoning. When running V2, reasoning tends to be more defined, make it easier to figure out what parts of text are heavily influencing positive classification.  ",
+      },
+      {
+        media: {
+          kind: "image",
+          src: "public/images/steam-example.png",
+          alt: "Example of V2 Text Reasoning",
+          caption: "Likely fp, but helpful for finding potential bias.",
+          ratio: "1200 / 400",
+          fit: "contain",
+        },
+      },
+      {
+        heading: "Issues and Bias:",
+        text: "While I was testing the model on social media there were a few things that I noticed early on that need to be addresses in future versions:",
+        items: [
+           "V2 is still overconfident despite the data diversity. I still need to do further fixes, and I'm planning on doing another fine-tuning session with a higher weight decay. If that winds up failing I will have to change the confidence system.",
+           "Since both the lmarena datasets included some rows with math symbols and equations in them, simpily having math in a post can cause V2 to lean to AI.",
+           "Based on the OOD testing results there's a chance V2 is assuming that long posts = AI. I didn't really notice that during initial testing, but if that's true I'll have to add long human data to training.",
+          "There might also be a potential problem with V2 and certain writing styles (such as the way Nintendo advertises things on twitter and in Nintendo Directs). If you keep up with video games you may know what I'm talking about." +
+          "I don't know why, I don't know how, but the styling and wording used constantly by Nintendo (and sometimes other gaming companies) always alert my AI detectors. This was an issue with V1 too. From what I've seen, it has nothing to do with the topics or content itself; it's specifically about the wording and communication methodology.",
+        ]
+       
+      },
+
+     
+    ]
+  },
   {
     type: "minor",
     kicker: "Small Update / Patch Notes",

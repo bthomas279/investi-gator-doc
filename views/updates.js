@@ -99,7 +99,7 @@ var UPDATES = [
      thumb: {
       src: "public/images/steam-example.png",
       alt: "A post badged by the updated scam detector",
-      ratio: "1500 / 400",
+      ratio: "1300 / 400",
     },
     excerpt:
       "It took a long time, but Version 2 of the AI Text detector has finally been trained and tested. This model version is by far the one I spent the most time optimizing. I've been very thoughful on the types of data I should use for training, and while I definitely think it's a step up from V1, it still needs further tweaking. " +
@@ -109,13 +109,16 @@ var UPDATES = [
       {
         heading: "Datasets:",
         text: 
-          "Like I mentioned in the past, I wanted V2 to tackle a lot of the issues present in V1.",
+          "Like I mentioned in the past, I wanted V2 to tackle a lot of the issues present in V1. Below are the datasets I used and their OODs",
         items: [
-          "Datasets on posts prior to 2020 (Webis, Kai)",
-          "",
-          "OOD datasets from some authors of the training data (ood_mage_gpt, ood_mage_gpt_para)",
-          "data from more recent models (ood_gsingh)",
-          "cut-out domains/models not included in training (ood_raid_llama, ood_raid_reviews)",
+          "Webis: (Reddit posts pre 2020)",
+          "Kai: (Twitter posts pre 2020)",
+          "MAGE",
+          "RAID",
+          "lmarena-expert: (prompt responses to expert topics + 2025 AI models)",
+          "lmarena-human-preference: (prompt responses to general topics + 2025 AI models)",
+          "Gsingh: (News Articles with more recent AI models)",
+          "Beemo: (human and ai responses to prompts + AI -> human paraphrasing)",
         ],
       },
       {

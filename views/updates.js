@@ -199,10 +199,11 @@ var UPDATES = [
       {
         heading: "My Thoughts:",
         text:
-          "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with published and widely known AI text detectors." +
+          "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with published and widely known AI text detectors. " +
           "I did the same thing here when testing on reddit and twitter. When comparing GPTZero and ACE with V2, V2 had the same postive classifications as then 3/4 of the positive classifications I cross referenced. I could only cross reference longer posts, but from the looks of it, V2 can predict AI text much more accurately in the field than V1. Not bad at all.",
       },
       {
+        heading: "AI-Text Reasoning",
         text: "With the new detector, AI text reasoning naturally experienced improved analysis and reasoning. When running V2, reasoning tends to be more defined, make it easier to figure out what parts of text are heavily influencing positive classification.  ",
       },
       {
@@ -222,8 +223,7 @@ var UPDATES = [
           "V2 is still overconfident despite the data diversity. I still need to do further fixes, and I'm planning on doing another fine-tuning session with a higher weight decay. If that winds up failing I will have to change the confidence system.",
           "Since both the lmarena datasets included some rows with math symbols and equations in them, simpily having math in a post can cause V2 to lean to AI.",
           "Based on the OOD testing results there's a chance V2 is assuming that long posts = AI. I didn't really notice that during initial testing, but if that's true I'll have to add long human data to training.",
-          "There might also be a potential problem with V2 and certain writing styles (such as the way Nintendo advertises things on twitter and in Nintendo Directs). If you keep up with video games you may know what I'm talking about." +
-            "I don't know why, I don't know how, but the styling and wording used constantly by Nintendo (and sometimes other gaming companies) always alert my AI detectors. This was an issue with V1 too. From what I've seen, it has nothing to do with the topics or content itself; it's specifically about the wording and communication methodology.",
+          "Likely other biases I haven't found yet. As optimizing continues, more biases will appear."
         ],
       },
     ],
@@ -231,7 +231,7 @@ var UPDATES = [
   {
     type: "minor",
     kicker: "Small Update / Patch Notes",
-    title: "Patch 1.2.a: AI-Text V1 Evaluation & Threshold Adjustments",
+    title: "Patch 0.3.a: AI-Text V1 Evaluation & Threshold Adjustments",
     date: "2026-08-14",
     excerpt:
       "I did some analysis on V1 of the AI text detector. Prior to implementing the text detector, I ran 6 tests on data it didn't see during training. " +

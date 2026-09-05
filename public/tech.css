@@ -1,0 +1,91 @@
+/* ==========================================================================
+   Investi-gator — "Tech Stack" section (#tech)
+
+   Shields.io "for-the-badge" pills, rebuilt in CSS. One block per tool:
+   flat brand color, logo on the left, name in bold caps on the right, no
+   border and no gradient — the color is the whole design.
+
+   Colors come from views/tech-stack.js and arrive as the --badge custom
+   property, set inline by main.js. Badges keep their brand color in both
+   light and dark mode on purpose: React cyan is React cyan either way, and
+   theming them would make them stop reading as logos.
+   ========================================================================== */
+
+.tech-group { margin-bottom: 30px; }
+.tech-group:last-child { margin-bottom: 0; }
+
+.tech-group h4 {
+  margin: 0 0 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.tech-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* The badge ---------------------------------------------------------------
+   Fixed 34px height and a small radius keep every badge on the same
+   baseline no matter how long its label is. */
+.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 6px;
+  background: var(--badge, var(--card));
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  /* Badges are labels, not links — stop double-tap text selection on
+     mobile from making them feel interactive. */
+  user-select: none;
+}
+
+/* Pale brand colors (Hugging Face yellow, React cyan, scikit orange) need
+   dark ink. Which one to use is decided per tool in views/tech-stack.js. */
+.tech-badge.is-dark-ink { color: #10120f; }
+
+.tech-badge-logo {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  /* The logo inherits the badge's ink, so one path serves both variants. */
+  color: currentColor;
+}
+
+/* No official logo ---------------------------------------------------------
+   Browser platform APIs and research libraries don't have brand marks, so
+   inventing one would be misleading. They share a muted green a shade below
+   the page background instead, plus the generic module glyph — visibly a
+   badge, visibly not a logo. The hairline keeps it from disappearing into
+   the section behind it in dark mode. */
+.tech-badge.is-generic {
+  background: #080d0a;
+  color: #cfdcd4;
+  box-shadow: inset 0 0 0 1px rgba(207, 220, 212, 0.16);
+}
+
+/* Small screens ----------------------------------------------------------
+   The long labels ("HuggingFace Transformers & Hub") are the ones that
+   overflow first, so trim the horizontal padding before anything wraps. */
+@media (max-width: 560px) {
+  .tech-badge {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 0.66rem;
+    gap: 6px;
+  }
+  .tech-badge-logo { width: 13px; height: 13px; }
+  .tech-list { gap: 8px; }
+}

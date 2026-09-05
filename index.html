@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="public/how-it-works.css" />
 <link rel="stylesheet" href="public/demo.css" />
 <link rel="stylesheet" href="public/updates.css" />
+<link rel="stylesheet" href="public/tech.css" />
 </head>
 <body>
 
@@ -233,28 +234,39 @@
     <p class="eyebrow">Built with</p>
     <h2>Tech Stack</h2>
     <p class="section-lede">
-    <h4>Software:</h4>
-    <div class="tech-list">
-      <span class="chip">Chrome (Manifest V3)</span>
-      <span class="chip">TypeScript</span>
-      <span class="chip">Vite</span>
-      <span class="chip">React.js</span>
-      <span class="chip">Service Workers</span>
-      <span class="chip">Mutation Observer</span>
-      <span class="chip">Offscreen</span>
-      <span class="chip">HTML</span>
-      <span class="chip">CSS</span>
+      Everything Investi-gator is built on, from the extension shell down to the models.
+    </p>
+
+    <!-- Both lists are filled in by main.js from views/tech-stack.js, which
+         holds each tool's brand color and logo. The plain chips below are
+         the no-JS fallback and get replaced when the badges render. -->
+    <div class="tech-group">
+      <h4>Software</h4>
+      <div class="tech-list" data-tech="software">
+        <span class="chip">Chrome (Manifest V3)</span>
+        <span class="chip">TypeScript</span>
+        <span class="chip">Vite</span>
+        <span class="chip">React.js</span>
+        <span class="chip">Service Workers</span>
+        <span class="chip">Mutation Observer</span>
+        <span class="chip">Offscreen</span>
+        <span class="chip">HTML</span>
+        <span class="chip">CSS</span>
+      </div>
     </div>
-    <h4>AI/ML:</h4>
-    <div class="tech-list">
-      <span class="chip">Python</span>
-      <span class="chip">PyTorch</span>
-      <span class="chip">HuggingFace Transformers & Hub</span>
-      <span class="chip">Transformers.js</span>
-      <span class="chip">Scikit-learn</span>
-      <span class="chip">ONNX (runtime)</span>
-      <span class="chip">LIME</span>
-      <span class="chip">FastAPI</span>
+
+    <div class="tech-group">
+      <h4>AI / ML</h4>
+      <div class="tech-list" data-tech="ai">
+        <span class="chip">Python</span>
+        <span class="chip">PyTorch</span>
+        <span class="chip">HuggingFace Transformers &amp; Hub</span>
+        <span class="chip">Transformers.js</span>
+        <span class="chip">Scikit-learn</span>
+        <span class="chip">ONNX (runtime)</span>
+        <span class="chip">LIME</span>
+        <span class="chip">FastAPI</span>
+      </div>
     </div>
   </div>
 </section>
@@ -276,6 +288,7 @@
      off the global. -->
 <script src="views/detection-styles.js"></script>
 <script src="views/updates.js"></script>
+<script src="views/tech-stack.js"></script>
 <script src="backend/main.js"></script>
 </body>
 </html>

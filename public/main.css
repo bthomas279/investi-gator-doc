@@ -9,6 +9,7 @@
      how-it-works.css  → #passive    (highlight panel, mock feed) + steps
      demo.css          → #demo       (screenshot / video placeholders)
      updates.css       → #updates    (patch notes feed + popup)
+     tech.css          → #tech       (brand-colored tech stack badges)
 
    Load order matters: main.css must come first, since the section files
    depend on the tokens defined below.
@@ -161,7 +162,8 @@ nav {
   margin-bottom: 30px;
 }
 
-/* Shared pill — used by the hero badges and the tech list */
+/* Hero pill under the headline. The tech stack used to share this, but now
+   renders as brand-colored badges instead (see tech.css). */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -238,11 +240,6 @@ h2 {
   margin: 0 0 40px;
 }
 
-
-/* Tech list --------------------------------------------------------------
-   Small enough to stay here rather than warrant its own file. */
-.tech-list { display: flex; flex-wrap: wrap; gap: 10px; }
-.tech-list .chip { font-size: 0.9rem; background: var(--card); }
 
 /* Footer ----------------------------------------------------------------- */
 footer {

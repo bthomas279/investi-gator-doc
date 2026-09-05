@@ -97,6 +97,36 @@
     });
   }
 
+  /* Tech stack badges ----------------------------------------------------
+     Paint the #tech lists from window.TECH_STACK (see views/tech-stack.js).
+     Each <div data-tech="..."> names a group in that file and is filled
+     with one brand-colored badge per tool. Entries with no brand color fall
+     back to the shared muted style and the generic glyph. */
+  function initTechStack() {
+    var groups = window.TECH_STACK;
+    if (!groups) return;
+
+    document.querySelectorAll("[data-tech]").forEach(function (list) {
+      var items = groups[list.dataset.tech];
+      if (!items) return;
+
+      list.innerHTML = items.map(function (item) {
+        var generic = !item.bg;
+        var classes = "tech-badge";
+        if (generic) classes += " is-generic";
+        else if (item.fg === "dark") classes += " is-dark-ink";
+
+        // Labels are ours, not user input, but they still pass through
+        // escapeHtml so an "&" in a name can't break the markup.
+        return '<span class="' + classes + '"' +
+               (generic ? "" : ' style="--badge:' + item.bg + '"') + ">" +
+               (item.icon || window.TECH_GENERIC_ICON || "") +
+               "<span>" + escapeHtml(item.label) + "</span>" +
+               "</span>";
+      }).join("");
+    });
+  }
+
   /* Update log -----------------------------------------------------------
      Renders the patch notes feed (#updates), the "What's New" summary in the
      demo section, and the popup both of them open. Everything comes from
@@ -131,17 +161,34 @@
     return parseDate(iso).toLocaleDateString(undefined, options);
   }
 
-  // Gator head in profile, jaws open. Filled rather than stroked on purpose:
-  // at this size an outline of a long snout closes up into a blob, while a
-  // solid silhouette keeps its shape. The eye is knocked out of the upper jaw
-  // by the evenodd fill rule, so it shows the card behind it at any color.
+  /* Gator head in profile, jaws open. Drawn the way the tech-stack logos are:
+     one solid silhouette rather than an outline, since at 20px a stroked
+     snout closes up into a blob.
+
+     It is a single path, not a jaw plus a separate lower jaw. The mouth is a
+     notch cut into the right side, so the head reads as one connected shape
+     instead of two floating slabs. The notch stops short of the back of the
+     skull rather than tapering to a point — a wedge that narrows to nothing
+     turns to grey mush once it drops below a pixel.
+
+     Three teeth, not a full row: at this size a finer sawtooth stops reading
+     as teeth and starts reading as noise. The eye is knocked out by the
+     evenodd fill rule, so it shows the card behind it at any color. */
   var GATOR_ICON =
     '<svg width="20" height="20" viewBox="0 0 24 24">' +
-    '<path fill="currentColor" fill-rule="evenodd" d="M2.3 10C2.3 6.3 4.6 3.8 8 3.8c2.4 0' +
-    " 4.2 1.5 5 3.7l7.7 1.9c1.8.4 1.8 2.5 0 2.8l-18.4.7Z" +
-    'M9.2 8.6a1.45 1.45 0 1 0-2.9 0 1.45 1.45 0 1 0 2.9 0Z"/>' +
-    '<path fill="currentColor" d="M4.3 14.9l16.4 1.9c1.6.2 1.6 2.5 0 2.7l-11.6 1c-3.1.3-4.8-1.8-4.8-4.1Z"/>' +
-    "</svg>";
+    '<path fill="currentColor" fill-rule="evenodd" d="' +
+    // cranium, brow ridge, snout, rounded nose
+    "M6.67 4.24C9.27 4.24 11.18 5.84 12.18 7.69C14.77 7.99 17.98 8.39 20.58 8.74" +
+    "C22.38 8.99 22.38 11.09 20.58 11.34" +
+    // upper bite line, back toward the hinge
+    "L19.78 11.39L17.98 13.51L16.18 11.62L14.37 13.74L12.58 11.85L10.77 13.97L8.98 12.08" +
+    // back of the mouth, then the lower jaw out to its tip and around
+    "L4.88 12.34L4.88 14.64L20.18 16.64C21.88 16.89 21.88 18.99 20.18 19.24" +
+    // underside of the jaw, throat, and up the back of the skull
+    "L9.37 19.74C5.77 19.99 2.07 17.64 2.07 13.84C2.07 8.24 3.47 4.24 6.67 4.24Z" +
+    // eye
+    "M7.98 8.14a1.25 1.25 0 1 0-2.5 0 1.25 1.25 0 1 0 2.5 0Z" +
+    '"/></svg>';
 
   function updateCardMarkup(update, index) {
     var kicker = update.kicker
@@ -457,6 +504,7 @@
 
   function init() {
     initDetectionBadges();
+    initTechStack();
     initUpdates();
     initScrollReveal();
     initActiveNav();

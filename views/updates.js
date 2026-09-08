@@ -112,7 +112,7 @@ var UPDATES = [
     type: "major",
     kicker: "Major Update",
     title: "V2 AI-Text Training, Implementation, Results, and Test Run",
-    date: "2026-09-04",
+    date: "2026-09-05",
     thumb: {
       src: "public/images/steam-example.png",
       alt: "Picture of AI-text V2",
@@ -125,7 +125,7 @@ var UPDATES = [
     sections: [
       {
         heading: "Datasets:",
-        text: "Like I mentioned in the past, I wanted V2 to tackle a lot of the issues present in V1. I've been very thoughful on the types of data I should use for training. Below are the datasets I used and their OODs:",
+        text: "Like I mentioned in the past, I wanted V2 to tackle a lot of the issues present in V1 (unfamiliar with SM posts and older models, paraphrased text inexperience, overconfidence, etc). I've been very thoughful on the types of data I should use for training. Below are the datasets I used and their OODs:",
       },
       {
         table: {
@@ -145,13 +145,13 @@ var UPDATES = [
             ],
             [
               "MAGE",
-              "General text vs AI test of same topic",
+              "General text vs AI text of same topic",
               "Official MAGE dataset OODs (regular + paraphrased)",
             ],
             [
               "RAID",
               "Human & AI prompt answers",
-              "Untrained domain and model",
+              "Untrained domain (reviews) and model",
             ],
             [
               "lmarena-expert",
@@ -160,7 +160,7 @@ var UPDATES = [
             ],
             [
               "lmarena-human-preference",
-              "Prompt responses from AI to general topics + 2025 AI models",
+              "Prompt responses from AI on general topics + 2025 AI models",
               "An untrained model",
             ],
             ["Gsingh", "AI & human generated news articles/stories", "N/A"],
@@ -178,40 +178,51 @@ var UPDATES = [
         },
       },
       {
-        text: "Data diversity was a high priority. Below are the OOD results of V2."
+        text: "Data diversity was a high priority; especially because I wanted to lower the overconfidence issue V1 faced. Below are the OOD results of V2."
       },
       {
         media: {
           kind: "image",
-          src: "public/images/v2-text-ood-0.5.png",
+          src: "public/images/v2-text-ood-6.36.png",
           alt: "Investi-gator's AI-Text Detector OOD Eval in 0.5 threshold",
-          caption: "OOD metrics with a threshold of 0.5.",
-          ratio: "1331 / 400",
+          caption: "OOD metrics with a margin of 6.36.",
+          ratio: "1331 / 300",
           fit: "contain",
         },
       },
       {
         text:
           "The metrics are a bit messy at the moment. There were slight improvements in the meterics for oods that were used " +
-          "when testing V1 (aside from MAGE), and it seems that V2 was able to absorb some of the patterns I hoped it would. ",
+          "when testing V1 (aside from MAGE), and it seems that V2 was able to absorb at least some of the patterns I hoped it would.",
       },
 
       {
-        heading: "My Thoughts:",
+        heading: "Cross Referencing Performance:",
         text:
-          "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with published and widely known AI text detectors. " +
-          "I did the same thing here when testing on reddit and twitter. When comparing GPTZero and ACE with V2, V2 had the same postive classifications as then 3/4 of the positive classifications I cross referenced. I could only cross reference longer posts, but from the looks of it, V2 can predict AI text much more accurately in the field than V1. Not bad at all.",
+          "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with published AI text detector. " +
+          "Since these models can also be incorrect too, cross referencing is more-so meant for consensus over accuracy. I didn't I did the same thing here when testing on reddit and twitter. When comparing GPTZero and ACE with V2, V2 had the same postive classifications as then 3/4 of the positive classifications I cross referenced. I could only cross reference longer posts, but from the looks of it, V2 can predict AI text much more accurately in the field than V1. Not bad at all.",
+      
+      },
+      {
+        media: {
+          kind: "image",
+          src: "public/images/gptzero-scan.png",
+          alt: "Example of V2 Text Reasoning",
+          caption: "Likely fp, but helpful for finding potential bias.",
+          ratio: "1200 / 400",
+          fit: "contain",
+        },
       },
       {
         heading: "AI-Text Reasoning",
-        text: "With the new detector, AI text reasoning naturally experienced improved analysis and reasoning. When running V2, reasoning tends to be more defined, make it easier to figure out what parts of text are heavily influencing positive classification.  ",
+        text: "With the new detector, AI text reasoning naturally experienced improved analysis and reasoning. When running V2 reasoning tends to be more defined which makes it easier to figure out what parts of text are heavily influencing positive classifications.",
       },
       {
         media: {
           kind: "image",
           src: "public/images/steam-example.png",
           alt: "Example of V2 Text Reasoning",
-          caption: "Likely fp, but helpful for finding potential bias.",
+          caption: "Text example comes from a Reddit post on the research/ML subreddit.",
           ratio: "1200 / 400",
           fit: "contain",
         },

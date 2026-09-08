@@ -28,6 +28,10 @@
   --accent-glow: rgba(52, 211, 153, 0.15);
   --warn: #fbbf24;
   --danger: #f87171;
+  /* AI-text detection. Same blue family as the AI Text badge in
+     views/detection-styles.js, so the sentence heat map on the playground
+     reads as the same signal as the badge it explains. */
+  --ai: #60a5fa;
   --radius: 16px;
   --maxw: 1080px;
 }
@@ -43,6 +47,7 @@
     --accent: #059669;
     --accent-deep: #047857;
     --accent-glow: rgba(5, 150, 105, 0.10);
+    --ai: #2563eb;
   }
 }
 
@@ -62,6 +67,20 @@ body {
 
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+/* Visible to screen readers, not on screen. Used for form labels whose
+   purpose is already obvious from the surrounding layout. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* Centered page gutter, used by every section */
 .wrap {
@@ -98,6 +117,11 @@ nav {
 }
 
 .brand .logo { font-size: 1.4rem; }
+
+/* On playground.html the nav brand is a link home rather than plain text.
+   These keep it looking identical to the <div> version on index.html. */
+nav a.brand { color: var(--text); }
+nav a.brand:hover { text-decoration: none; color: var(--accent); }
 
 .nav-links { display: flex; gap: 22px; font-size: 0.92rem; }
 .nav-links a { color: var(--text-dim); transition: color 0.15s ease; }
@@ -174,6 +198,39 @@ nav {
   border: 1px solid var(--card-border);
   background: var(--card);
   color: var(--text-dim);
+}
+
+/* Detection badge ---------------------------------------------------------
+   Shared by the mock feed on index.html and by live model output on
+   playground.html, so it lives here rather than in either page's file.
+
+   Colors come from BADGE_STYLES (views/detection-styles.js) and are applied
+   inline — by main.js on index.html, by IGShared.badgeMarkup on the
+   playground. The rules below cover layout only, plus a neutral fallback
+   appearance for when JavaScript is unavailable. */
+.flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: var(--card);
+  color: var(--text-dim);
+  border: 1px solid var(--card-border);
+}
+
+.flag svg { display: block; flex-shrink: 0; }
+
+/* Post avatar, shared by the same two pages. */
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--card-border);
+  flex-shrink: 0;
 }
 
 /* Buttons ---------------------------------------------------------------- */

@@ -1,0 +1,499 @@
+/* ==========================================================================
+   Investi-gator — model playground (playground.html)
+
+   Everything on the live-demo page. Depends on the tokens in main.css and
+   on the shared .flag / .post-row / .avatar rules that main.css now owns.
+
+   Class prefix is pg- throughout so nothing here can collide with the
+   marketing sections on index.html.
+   ========================================================================== */
+
+.pg-shell {
+  display: grid;
+  gap: 20px;
+  max-width: 780px;
+}
+
+/* Stand-in warning ---------------------------------------------------------
+   Shown whenever engine.js falls back to the keyword stand-in. It is not
+   dismissible on purpose: results that are not real must never be able to
+   sit on screen without saying so. */
+.pg-banner {
+  border: 1px solid var(--warn);
+  border-left-width: 4px;
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--warn) 10%, transparent);
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.pg-banner strong { color: var(--warn); }
+
+/* Panels ------------------------------------------------------------------ */
+.pg-panel {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 20px;
+}
+
+.pg-load {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.pg-load-copy { flex: 1; min-width: 240px; }
+
+.pg-load-actions {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  max-width: 280px;
+}
+
+.pg-keep {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.pg-keep input { margin: 2px 0 0; flex: none; cursor: pointer; }
+
+/* Understated on purpose: freeing 200MB should be easy to find and
+   impossible to hit by accident. */
+.pg-clear {
+  margin-top: 4px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.pg-clear:hover { border-color: var(--danger); color: var(--danger); }
+.pg-clear[disabled] { opacity: 0.5; cursor: progress; }
+
+.pg-load-copy h3 {
+  margin: 0 0 6px;
+  font-size: 1.02rem;
+}
+
+.pg-load-copy p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.pg-meta code {
+  background: var(--bg-soft);
+  border: 1px solid var(--card-border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.85em;
+}
+
+/* Progress ---------------------------------------------------------------- */
+.pg-progress { width: 100%; }
+
+.pg-progress-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--card-border);
+  overflow: hidden;
+}
+
+.pg-progress-bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.18s ease;
+}
+
+.pg-progress-label {
+  margin: 7px 0 0;
+  font-size: 0.84rem;
+  color: var(--text-dim);
+}
+
+/* Input ------------------------------------------------------------------- */
+.pg-samples:empty { display: none; }
+
+/* Sits inline with the sample chips, so the row reads as a labelled set
+   rather than three unexplained buttons. */
+.pg-samples-label {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  align-self: center;
+  margin-right: 2px;
+}
+
+.pg-samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pg-sample {
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.pg-sample:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.pg-textarea {
+  width: 100%;
+  min-height: 150px;
+  resize: vertical;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-soft);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.pg-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.pg-input-foot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.pg-input-meta {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pg-advice {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+  max-width: 46ch;
+}
+
+.pg-advice:empty { display: none; }
+.pg-advice.is-warn { color: var(--danger); }
+
+#pg-counter {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+#pg-counter.is-over { color: var(--danger); }
+
+/* Below the recommended length: amber, not red. The text still classifies,
+   so this is a nudge rather than a rejection. */
+#pg-counter.is-under { color: var(--warn); }
+
+#pg-analyze[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Result ------------------------------------------------------------------ */
+.pg-result-head { margin-bottom: 14px; }
+
+.pg-result-head h3 { margin: 0; font-size: 1.05rem; }
+
+/* The pasted text, badged the way the extension would badge it ------------ */
+.pg-post {
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--bg-soft);
+  padding: 16px;
+}
+
+.pg-post.is-clean { border-style: dashed; }
+
+.pg-post-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pg-post-who { flex: 1; min-width: 0; line-height: 1.3; }
+
+.pg-post-name { display: block; font-weight: 600; font-size: 0.92rem; }
+
+.pg-post-handle {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+.pg-post-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.pg-post-body {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.flag-value {
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Every detector that ran, hit or not ------------------------------------- */
+.pg-verdicts {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.pg-verdict {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 9px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 9px;
+  font-size: 0.88rem;
+  color: var(--text-dim);
+}
+
+.pg-verdict.is-hit {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--card-border));
+  color: var(--text);
+}
+
+.pg-verdict-name { font-weight: 600; }
+
+.pg-verdict-state { font-size: 0.82rem; }
+
+.pg-verdict.is-hit .pg-verdict-state { color: var(--accent); }
+
+.pg-verdict-value { font-variant-numeric: tabular-nums; }
+
+.pg-verdict-note {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+
+/* Reasoning --------------------------------------------------------------- */
+.pg-why-block { margin-top: 16px; }
+
+.pg-why { font-size: 0.88rem; padding: 9px 16px; cursor: pointer; }
+
+.pg-why[disabled] { opacity: 0.5; cursor: progress; }
+
+.pg-reason-slot:empty { display: none; }
+
+.pg-reason {
+  margin-top: 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--bg-soft);
+  padding: 16px;
+}
+
+.pg-reason-head {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.pg-reason-head strong { color: var(--text); }
+
+.pg-reason-body {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+/* Score annotations --------------------------------------------------------
+   --heat (0-1) for sentence AI-ness, --w (0-1) for word attribution
+   magnitude. Both are set inline by render.js; the colour maths stays here
+   so the palette follows the theme tokens. */
+.pg-ann {
+  border-radius: 4px;
+  padding: 2px 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.pg-ann-sentence {
+  background: color-mix(in srgb, var(--ai) calc(var(--heat) * 55%), transparent);
+}
+
+.pg-ann-sentence.is-flagged {
+  box-shadow: inset 0 -2px 0 var(--ai);
+}
+
+.pg-reason-key {
+  margin: 14px 0 0;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.pg-key-swatch {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  flex: none;
+}
+
+.pg-key-swatch:not(:first-child) { margin-left: 12px; }
+.pg-key-swatch.is-ai { background: color-mix(in srgb, var(--ai) 55%, transparent); }
+.pg-key-swatch.is-toward { background: color-mix(in srgb, var(--danger) 48%, transparent); }
+.pg-key-swatch.is-away { background: color-mix(in srgb, var(--accent) 40%, transparent); }
+
+/* Ranked word attributions -------------------------------------------------
+   The extension pulls the top LIME words out of the post rather than
+   highlighting them in place, so this does too. --w is the score magnitude
+   normalised against the strongest word, set inline by render.js. */
+.pg-words {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.pg-word {
+  display: grid;
+  grid-template-columns: minmax(0, 9rem) 1fr auto;
+  gap: 12px;
+  align-items: center;
+  font-size: 0.88rem;
+}
+
+.pg-word-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.pg-word-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--card-border);
+  overflow: hidden;
+}
+
+.pg-word-bar span {
+  display: block;
+  height: 100%;
+  width: calc(var(--w) * 100%);
+  border-radius: 999px;
+}
+
+.pg-word.is-toward .pg-word-bar span { background: var(--danger); }
+.pg-word.is-away .pg-word-bar span { background: var(--accent); }
+
+.pg-word-score {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* Indeterminate bar ---------------------------------------------------------
+   Reasoning reports no progress, so the bar shows motion without claiming a
+   percentage. */
+.pg-progress-bar.is-indeterminate span {
+  width: 35%;
+  animation: pg-slide 1.15s ease-in-out infinite;
+}
+
+@keyframes pg-slide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(340%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pg-progress-bar.is-indeterminate span { animation: none; width: 100%; opacity: 0.5; }
+}
+
+/* Notes ------------------------------------------------------------------- */
+.pg-clean-note,
+.pg-error {
+  margin: 16px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.pg-clean-note { color: var(--text-dim); }
+
+.pg-thin-note {
+  margin: 12px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--text-dim);
+  border-left: 3px solid var(--card-border);
+  padding-left: 11px;
+}
+
+.pg-error {
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.pg-caveats {
+  margin-top: 8px;
+  font-size: 0.86rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.pg-caveats li { margin-bottom: 6px; }
+
+@media (max-width: 560px) {
+  .pg-load { flex-direction: column; align-items: stretch; }
+  .pg-post-head { flex-wrap: wrap; }
+  .pg-post-flags { justify-content: flex-start; width: 100%; }
+  .pg-verdict { grid-template-columns: 1fr auto; }
+  .pg-verdict-state { grid-column: 1 / -1; }
+}

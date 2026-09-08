@@ -10,6 +10,11 @@
 
   var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* Shared with playground.html, which needs the same escaping for text
+     people actually type into it. See backend/shared.js, which must load
+     before this file on every page. */
+  var escapeHtml = window.IGShared.escapeHtml;
+
   /* Scroll reveal --------------------------------------------------------
      Fade cards in as they enter the viewport. Elements are only hidden
      once we know IntersectionObserver is available, so a browser without
@@ -133,15 +138,9 @@
      window.UPDATES (see views/updates.js), so the page never holds a second
      copy of an update's text. */
 
-  // Update text is ours, not user input, but it still goes through escaping
-  // so an ampersand or angle bracket in a patch note can't break the markup.
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-  }
+  // Update text is ours, not user input, but it still goes through escapeHtml
+  // (declared at the top of this file) so an ampersand or angle bracket in a
+  // patch note can't break the markup.
 
   // Escape first, then allow **bold** as the one bit of inline formatting.
   function inlineText(str) {

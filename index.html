@@ -24,6 +24,7 @@
       <a href="#demo">Demo</a>
       <a href="#updates">Updates</a>
       <a href="#tech">Tech</a>
+      <a href="playground.html">Try the Models</a>
     </div>
   </div>
 </nav>
@@ -188,7 +189,7 @@
           <img src="public/images/current_scam_look.png" alt="Investi-gator's popup in action">
         </div>
         <figcaption class="media-caption">
-          <strong>Investi-gator's updated scam detector.</strong> Now it doesn't usually badge unless a post actually does look like a scam. Like this one above.
+          <strong>Investi-gator's V1.5 scam detector.</strong> Most fp usually stem from posts mentioning sweepstakes, givaways, or purchasing/selling something. Like this one above.
         </figcaption>
       </figure>
     </div>
@@ -234,7 +235,7 @@
     <p class="eyebrow">Built with</p>
     <h2>Tech Stack</h2>
     <p class="section-lede">
-      Everything Investi-gator is built on, from the extension shell down to the models.
+      Everything Investi-gator is built on. Ranges from extension architecture to AI fine-tuning.
     </p>
 
     <!-- Both lists are filled in by main.js from views/tech-stack.js, which
@@ -265,6 +266,7 @@
         <span class="chip">Scikit-learn</span>
         <span class="chip">ONNX (runtime)</span>
         <span class="chip">LIME</span>
+        <span class="chip">Kaggle Notebook</span>
         <span class="chip">FastAPI</span>
       </div>
     </div>
@@ -287,6 +289,7 @@
 <!-- Data files must load before main.js, which reads BADGE_STYLES and UPDATES
      off the global. -->
 <script src="views/detection-styles.js"></script>
+<script src="backend/shared.js"></script>
 <script src="views/updates.js"></script>
 <script src="views/tech-stack.js"></script>
 <script src="backend/main.js"></script>

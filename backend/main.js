@@ -300,6 +300,16 @@
       element =
         '<img src="' + escapeHtml(media.src) +
         '" alt="' + escapeHtml(media.alt || "") + '" loading="lazy"' + fitStyle + ">";
+
+      // A detailed screenshot is hard to read at the popup's width, so the
+      // frame doubles as a button that opens the full-screen viewer. A slot
+      // that shouldn't be enlargeable sets `zoom: false`.
+      if (media.zoom !== false) {
+        element =
+          '<button class="media-zoom" type="button" aria-label="' +
+          escapeHtml(media.alt ? "Enlarge image: " + media.alt : "Enlarge image") +
+          '">' + element + "</button>";
+      }
     }
 
     return (
@@ -419,6 +429,72 @@
     );
   }
 
+  /* Full-screen image viewer, shared by every image in the patch notes.
+     Opens fitted to the window; an image with more pixels than that can be
+     clicked again to switch to its actual size, which the wrapper scrolls. */
+  function initMediaLightbox() {
+    var box = document.getElementById("media-lightbox");
+    if (!box) return null;
+
+    var img = box.querySelector("img");
+    var caption = box.querySelector("figcaption");
+    var closeBtn = box.querySelector(".media-lightbox-close");
+    var lastFocused = null;
+
+    function open(trigger) {
+      var source = trigger.querySelector("img");
+      if (!source) return;
+
+      img.src = source.currentSrc || source.src;
+      img.alt = source.alt;
+
+      // Reuse the slot's caption, already rendered under the popup's figure.
+      var figure = trigger.closest("figure");
+      var figCaption = figure && figure.querySelector("figcaption");
+      caption.innerHTML = figCaption ? figCaption.innerHTML : "";
+      caption.hidden = !figCaption;
+
+      box.classList.remove("is-actual");
+      lastFocused = document.activeElement;
+      box.hidden = false;
+      document.body.classList.add("no-scroll");
+      closeBtn.focus();
+    }
+
+    function close() {
+      if (box.hidden) return;
+      box.hidden = true;
+      box.classList.remove("is-actual");
+      img.removeAttribute("src");
+      // The patch notes popup is usually still open underneath, and it wants
+      // the page locked for itself.
+      if (!document.querySelector(".update-modal:not([hidden])")) {
+        document.body.classList.remove("no-scroll");
+      }
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    // Fitted <-> actual size. Ignored once the image is already showing
+    // every pixel it has, so the click never blows it up past its own size.
+    img.addEventListener("click", function () {
+      if (box.classList.contains("is-actual")) {
+        box.classList.remove("is-actual");
+        return;
+      }
+      if (img.naturalWidth > img.clientWidth || img.naturalHeight > img.clientHeight) {
+        box.classList.add("is-actual");
+      }
+    });
+
+    return {
+      open: open,
+      close: close,
+      isOpen: function () {
+        return !box.hidden;
+      },
+    };
+  }
+
   function initUpdates() {
     var updates = window.UPDATES;
     if (!updates || !updates.length) return;
@@ -436,6 +512,7 @@
     var titleEl = modal.querySelector("#update-modal-title");
     var body = modal.querySelector(".update-dialog-body");
     var closeBtn = modal.querySelector(".update-close");
+    var lightbox = initMediaLightbox();
     var lastFocused = null;
 
     function open(update) {
@@ -469,6 +546,7 @@
 
     function close() {
       if (modal.hidden) return;
+      if (lightbox) lightbox.close();
       modal.hidden = true;
       document.body.classList.remove("no-scroll");
       // Stop any video that was left playing inside the popup.
@@ -488,10 +566,28 @@
         return;
       }
       if (event.target.closest(".update-close, .update-modal-backdrop")) close();
+
+      if (!lightbox) return;
+      var zoom = event.target.closest(".media-zoom");
+      if (zoom) {
+        lightbox.open(zoom);
+        return;
+      }
+      // Anywhere in the viewer that isn't the image or its caption closes
+      // it — the backdrop, the close button, the space around the image.
+      if (
+        event.target.closest(".media-lightbox") &&
+        !event.target.closest(".media-lightbox img, .media-lightbox figcaption")
+      ) {
+        lightbox.close();
+      }
     });
 
+    // The viewer sits on top of the popup, so it takes the Escape first.
     document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") close();
+      if (event.key !== "Escape") return;
+      if (lightbox && lightbox.isOpen()) lightbox.close();
+      else close();
     });
   }
 

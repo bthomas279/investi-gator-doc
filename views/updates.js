@@ -74,6 +74,11 @@
 
    The wide metrics strip in the first entry below shows the pair in use.
 
+   Whatever the frame ends up being, an image in the popup can be clicked to
+   open full screen, and clicked again there to go to its actual pixel size —
+   so a dense screenshot stays readable without a giant frame. Set
+   `zoom: false` on a slot that shouldn't do that.
+
    TABLES
    A table block, and the top-level `table` shorthand, take:
 
@@ -95,7 +100,7 @@
    @typedef {{ kind: "image" | "video" | "embed", src: string, alt?: string,
                poster?: string, title?: string, caption?: string,
                ratio?: string, fit?: "cover" | "contain",
-               maxWidth?: string }} UpdateMedia
+               maxWidth?: string, zoom?: boolean }} UpdateMedia
    @typedef {{ headers?: string[], rows: string[][], caption?: string,
                maxWidth?: string }} UpdateTable
    @typedef {{ heading?: string, text?: string | string[], items?: string[],

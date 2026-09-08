@@ -200,16 +200,30 @@ var UPDATES = [
         heading: "Cross Referencing Performance:",
         text:
           "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with published AI text detector. " +
-          "Since these models can also be incorrect too, cross referencing is more-so meant for consensus over accuracy. When comparing GPTZero and ACE with V2, V2 had the same postive classifications as then 3/4 of the positive classifications " +
-          "I cross referenced. I could only cross reference longer posts, but from the looks of it, V2 comes to the same consenus as published models much more often compared to V1.",
-      
+          "Since these models can also be incorrect too, cross referencing is more-so meant for consensus over accuracy.",
+      },
+      {
+        text: 
+          "When comparing GPTZero and ACE with V2, V2 had the same classification in about 5/7 of the text classifications " +
+          "I cross referenced. I could only cross reference longer posts, but from the looks of it, V2 comes to the same consenus as published models much more often compared to V1. " +
+          "Even when it comes to AI polishing, it seems like V2 can detect that better too.",
+      },
+      {
+        media: {
+          kind: "image",
+          src: "public/images/gator-example.png",
+          alt: "Example of V2 Text Reasoning",
+          caption: "Invest-gator's classification on Reddit post text (comes from a Reddit post on the research/ML subreddit)",
+          ratio: "1200 / 400",
+          fit: "contain",
+        },
       },
       {
         media: {
           kind: "image",
           src: "public/images/gptzero-scan.png",
           alt: "Example of V2 Text Reasoning",
-          caption: "Likely fp, but helpful for finding potential bias.",
+          caption: "GPTZero's classification on the same text",
           ratio: "1200 / 400",
           fit: "contain",
         },
@@ -223,7 +237,7 @@ var UPDATES = [
           kind: "image",
           src: "public/images/steam-example.png",
           alt: "Example of V2 Text Reasoning",
-          caption: "Text example comes from a Reddit post on the research/ML subreddit.",
+          caption: "Likely fp, but helpful for finding potential bias.",
           ratio: "1200 / 400",
           fit: "contain",
         },
@@ -238,6 +252,13 @@ var UPDATES = [
           "Likely other biases I haven't found yet. As optimizing continues, more biases will appear."
         ],
       },
+    ],
+    /* Currently working on */
+    whatsNext: [
+      "Before I do anything else regarding this project I want to completely analyze and finish patching the scam detector. My idea of finished in this case means that the model has a very low fpr. The less it badges incorrectly, the better.",
+      "I also want to further improve the AI text detector. I still need to do more testing so I don't know how much further I'll need to optimize before I move on. I'll likely attempt to fix some of the most common fp seen, and wait until I get the other models up and running before working on it more.",
+      "Maybe try to get Investi-gator properly running on Facebook and LinkedIn. Both of those websites are a pain to work with, especially Facebook since their posts don't have IDs and their DOM are inconsistant.",
+      "I will likely remove the option to set minimum confidence requirements for AI text detection (due to its overconfidence).",
     ],
   },
   {

@@ -200,7 +200,8 @@ var UPDATES = [
         heading: "Cross Referencing Performance:",
         text:
           "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with published AI text detector. " +
-          "Since these models can also be incorrect too, cross referencing is more-so meant for consensus over accuracy. I didn't I did the same thing here when testing on reddit and twitter. When comparing GPTZero and ACE with V2, V2 had the same postive classifications as then 3/4 of the positive classifications I cross referenced. I could only cross reference longer posts, but from the looks of it, V2 can predict AI text much more accurately in the field than V1. Not bad at all.",
+          "Since these models can also be incorrect too, cross referencing is more-so meant for consensus over accuracy. When comparing GPTZero and ACE with V2, V2 had the same postive classifications as then 3/4 of the positive classifications " +
+          "I cross referenced. I could only cross reference longer posts, but from the looks of it, V2 comes to the same consenus as published models much more often compared to V1.",
       
       },
       {

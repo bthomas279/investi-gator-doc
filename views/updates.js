@@ -130,7 +130,7 @@ var UPDATES = [
     sections: [
       {
         heading: "Datasets:",
-        text: "Like I mentioned in the past, I wanted V2 to tackle a lot of the issues present in V1 (unfamiliar with SM posts and older models, paraphrased text inexperience, overconfidence, etc). I've been very thoughful on the types of data I should use for training. Below are the datasets I used and their OODs:",
+        text: "Like I mentioned in the past, I wanted V2 to tackle a lot of the issues that were present in V1 (unfamiliar with SM posts and older models, paraphrased text inexperience, overconfidence, etc). I've been very thoughful on the types of data I should use for training. Below are the datasets I used and their OODs:",
       },
       {
         table: {

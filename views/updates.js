@@ -204,7 +204,7 @@ var UPDATES = [
       {
         heading: "Cross Referencing Performance:",
         text:
-          "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with published AI text detector. " +
+          "When I perform testing on social media I like to cross reference my AI's classifications with classifications from other AI text detectors (such as GPTZero or ACE) to compare performance with fully shipped AI text detectors. " +
           "Since these models can also be incorrect too, cross referencing is more-so meant for consensus over accuracy.",
       },
       {

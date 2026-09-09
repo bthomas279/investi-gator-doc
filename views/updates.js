@@ -198,7 +198,7 @@ var UPDATES = [
       {
         text:
           "The metrics are a bit messy at the moment. There were slight improvements in the meterics for oods that were used " +
-          "when testing V1 (aside from MAGE), and it seems that V2 was able to absorb at least some of the patterns I hoped it would.",
+          "when testing V1 and it seems that V2 was able to absorb at least some of the patterns I hoped it would.",
       },
 
       {

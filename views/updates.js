@@ -117,7 +117,7 @@ var UPDATES = [
     type: "major",
     kicker: "Major Update",
     title: "V2 AI-Text Training, Implementation, Results, and Test Run",
-    date: "2026-09-05",
+    date: "2026-09-08",
     thumb: {
       src: "public/images/steam-example.png",
       alt: "Picture of AI-text V2",
@@ -249,7 +249,7 @@ var UPDATES = [
       },
       {
         heading: "Issues and Bias:",
-        text: "While I was testing the model on social media there were a few things that I noticed early on that need to be addresses in future versions:",
+        text: "While I was testing the model on social media there were a few things that I noticed early on that need to be addressed in future versions:",
         items: [
           "V2 is still overconfident despite the data diversity. I still need to do further fixes, and I'm planning on doing another fine-tuning session with a higher weight decay. If that winds up failing I will have to change the confidence system.",
           "Since both the lmarena datasets included some rows with math symbols and equations in them, simpily having math in a post can cause V2 to lean to AI.",
@@ -260,7 +260,7 @@ var UPDATES = [
     ],
     /* Currently working on */
     whatsNext: [
-      "Before I do anything else regarding this project I want to completely analyze and finish patching the scam detector. My idea of finished in this case means that the model has a very low fpr. The less it badges incorrectly, the better.",
+      'Before I do anything else regarding this project I want to completely analyze and finish patching the scam detector. My idea of "finished" in this case means that the model has a very low fpr. The less it badges incorrectly, the better.',
       "I also want to further improve the AI text detector. I still need to do more testing so I don't know how much further I'll need to optimize before I move on. I'll likely attempt to fix some of the most common fp seen, and wait until I get the other models up and running before working on it more.",
       "Maybe try to get Investi-gator properly running on Facebook and LinkedIn. Both of those websites are a pain to work with, especially Facebook since their posts don't have IDs and their DOM are inconsistant.",
       "I will likely remove the option to set minimum confidence requirements for AI text detection (due to its overconfidence).",

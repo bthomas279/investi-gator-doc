@@ -75,7 +75,7 @@ window.PlaygroundRender = (function () {
        like the model is 87% sure it IS a scam. */
     return '<ul class="pg-verdicts">' + rows + "</ul>" +
       '<p class="pg-verdict-note">Percentages are how confident each AI is with its classification. ' +
-      '≈100% = "very confident this is AI or a scam" | ≈0% = "very confident this is not AI or a scam" | ≈50% = "I have no clue what this is". </p>';
+      '≈100% = "very confident" | ≈50% = "I have no clue what this is". </p>';
   }
 
   /* AI text reasoning. SentenceScan gives a per-sentence AI-ness score and

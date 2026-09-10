@@ -146,7 +146,7 @@ window.PlaygroundMockEngine = (function () {
       flagged: flagged,
       total: sentences.length,
       aiFraction: fraction,
-      band: fraction >= 0.6 ? "mostly" : fraction >= 0.25 ? "partly" : "traces",
+      band: fraction >= 0.7 ? "mostly" : fraction >= 0.25 ? "partly" : "traces",
     };
   }
 

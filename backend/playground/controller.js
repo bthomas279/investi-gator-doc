@@ -304,7 +304,14 @@
       state.storageBytes = await Engine.storageUsed();
     } catch (err) {
       state.phase = "error";
-      state.error = "The models failed to load. " + (err && err.message ? err.message : "");
+      var message = err && err.message ? err.message : "";
+      /* 429 is Hugging Face's per-IP rate limit, usually hit on cellular
+         data or a VPN where many people share one address. transformers.js
+         has no named message for it and throws
+         'Error (429) occurred while trying to load file: "<url>".' */
+      state.error = /Error \(429\)/.test(message)
+        ? "The models were unable to download. Your wifi may be off, or your VPN may be interfering. Try again a little later. Contact me if the issue persists."
+        : "The models failed to load. " + message;
     }
     render();
   }

@@ -114,6 +114,36 @@
    ========================================================================== */
 var UPDATES = [
   {
+    type: "minor",
+    kicker: "Small Update / Patch Notes",
+    title: "Patch 0.3.b: Investi-gator Runs on LinkedIn! + (Minor Updates, Bug Fixes too)",
+    date: "2026-09-24",
+    excerpt:
+    "Don't have a bunch of updates since I've been pretty busy. I'm planning out future steps for Investi-gator before I continue development. " +
+    "I realized that I need to figure out how users will be able to access this extension and the models. I need to come up with clear checkpoints and the operations needed to reach those checkpoints.",
+
+    sections: [
+      {
+        heading: " New Updates",
+        items: [
+          "Investi-gator now works on LinkedIn! There's currently minor badge placement oversights and bugs, so it's not currently ready to share yet.",
+          "Minor UI background updates for the badge popup, extension popup, and settings. Background matches the same background in the webpage.",
+          "The text box for AI text reasoning is larger to make it easier to read.",
+          "The extension popup's detection counter shape has slightly changed.",
+        ]
+
+      },
+      {
+        heading: "Bug Fixes",
+        items: [
+          "Fixed the incorrect model confidence % in the documentation and the extension. The bug only impacted AI text. Turns out I needed to use raw logits to get the correct confidence. I now don't have to remove the min confidence settings for AI text.",
+          "Reasoning requests are now prioritzed. Previously you had to wait for all current classification requests to run. Now reasoning requests skip the line.",
+          "Popup doesn't buffer anymore on click when classifications are running. Detection counters update in real time too. "
+        ]
+      }
+    ]
+  },
+  {
     type: "major",
     kicker: "Major Update",
     title: "V2 AI-Text Training, Implementation, Results, and Test Run",

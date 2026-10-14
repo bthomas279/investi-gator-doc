@@ -142,9 +142,14 @@
   // (declared at the top of this file) so an ampersand or angle bracket in a
   // patch note can't break the markup.
 
-  // Escape first, then allow **bold** as the one bit of inline formatting.
-  function inlineText(str) {
-    return escapeHtml(str).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  // Escape first, then allow **bold** and [text](https://...) links.
+  // `plain` keeps the link text but drops the <a>, for text inside a <button>.
+  function inlineText(str, plain) {
+    var html = escapeHtml(str).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    return html.replace(
+      /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      plain ? "$1" : '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+    );
   }
 
   // Built from parts on purpose: new Date("2026-08-07") is parsed as UTC and
@@ -206,16 +211,27 @@
       );
     }
 
-    var thumb = update.thumb
-      ? '<span class="update-thumb"><img src="' + escapeHtml(update.thumb.src) +
-        '" alt="' + escapeHtml(update.thumb.alt || "") + '" loading="lazy"></span>'
-      : "";
+    // `width` sizes the thumbnail column through a custom property the card's
+    // grid reads; `ratio` and `fit` retune the frame the same way they do on
+    // a popup media slot. Anything left out keeps the defaults in updates.css.
+    var thumb = "";
+    var cardStyle = "";
+    if (update.thumb) {
+      thumb =
+        '<span class="update-thumb"' +
+        styleAttr([["aspect-ratio", safeCssValue(update.thumb.ratio)]]) +
+        '><img src="' + escapeHtml(update.thumb.src) +
+        '" alt="' + escapeHtml(update.thumb.alt || "") + '" loading="lazy"' +
+        styleAttr([["object-fit", safeCssValue(update.thumb.fit)]]) + "></span>";
+      cardStyle = styleAttr([["--thumb-width", safeCssValue(update.thumb.width)]]);
+    }
     var excerpt = update.excerpt
-      ? '<span class="update-excerpt">' + inlineText(update.excerpt) + "</span>"
+      ? '<span class="update-excerpt">' + inlineText(update.excerpt, true) + "</span>"
       : "";
 
     return (
-      '<button class="update-card is-major" type="button" data-update="' + index + '">' +
+      '<button class="update-card is-major" type="button" data-update="' + index + '"' +
+      cardStyle + ">" +
       thumb +
       '<span class="update-card-body">' + kicker + title + excerpt + "</span>" +
       "</button>"

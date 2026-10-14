@@ -18,7 +18,8 @@
      kicker    Small label above the title ("Major Update", "Patch Notes"…)
      title     Headline, shown on the card and at the top of the popup
      date      "YYYY-MM-DD". Drives the date grouping and the "Posted" line.
-     thumb     { src, alt } — major cards only; ignored on minor ones
+     thumb     { src, alt, width, ratio, fit } — major cards only; ignored on
+               minor ones. See SIZING THUMBNAILS for the last three.
      excerpt   The lead-in, written once and used twice: it previews the
                update on a major card and opens the popup as its first
                paragraph. Worth writing for minor updates too — their card is
@@ -79,6 +80,20 @@
    so a dense screenshot stays readable without a giant frame. Set
    `zoom: false` on a slot that shouldn't do that.
 
+   SIZING THUMBNAILS
+   A major card's thumbnail defaults to a 240px-wide, 16:9 frame with the
+   image cropped to fill it. The same kind of optional fields retune it, on
+   that card alone:
+
+     width     How wide the thumbnail column is — '320px', '30%'. The frame's
+               height follows from this and `ratio`.
+     ratio     Frame shape, same as on a media slot ('4 / 3', '1200 / 800')
+     fit       'cover' (default, crops to fill) or 'contain' (shows the whole
+               image, letterboxed)
+
+   On phone-width screens the thumbnail always spans the full card, so
+   `width` only applies on wider screens.
+
    TABLES
    A table block, and the top-level `table` shorthand, take:
 
@@ -106,13 +121,159 @@
    @typedef {{ heading?: string, text?: string | string[], items?: string[],
                media?: UpdateMedia, table?: UpdateTable }} PatchBlock
    @typedef {{ type: "major" | "minor", kicker?: string, title: string,
-               date: string, thumb?: { src: string, alt?: string },
+               date: string, thumb?: { src: string, alt?: string,
+                 width?: string, ratio?: string,
+                 fit?: "cover" | "contain" },
                excerpt?: string, sections?: PatchBlock[],
                media?: UpdateMedia, table?: UpdateTable,
                whatsNext?: string | string[] | PatchBlock }} Update
    @type {Update[]}
    ========================================================================== */
 var UPDATES = [
+  {
+    type: "major",
+    kicker: "Major Update",
+    title: "V2 scam detector tuned and implemented! System optimizations, model migration to Hugging Face Hub, and more",
+    date: "2026-10-14",
+    thumb: {
+      src: "public/images/oct10-bp.png",
+      alt: "Picture of scam/spam V2",
+      ratio: "1200 / 800",
+    },
+    excerpt:
+      "V2 of the scam detector has finally been trained, tested, and implemented. For this version, I had to think a lot about the types of data that were missing from V1.5's training. " +
+      "Based off the results I will show below and some initial testing in the field, I will definitely need to further tune the model again some point later." +
+      "",
+     
+    sections: [
+      {
+        heading: "Datasets:",
+        text: "Just like with the V2 AI-text classifier, I wanted V2 of the scam detector to tackle a lot of false flags that were present in V1.5 " +
+          "Some biases I noticed from V1.5 resulting in false flags included cases of plugging, mentions of money, self advertising, job advertising, etc. I figured gathering data to solve these problems would be easier than the data gathering needed for v2, but I was quickly proven wrong." +
+          " Here are V2's datasets and OODs:"
+      },
+      {
+        table: {      
+          headers: ["Dataset", "Contents", "OOD"],
+          rows: [
+            [
+              "Webis",
+              "Reddit posts pre 2020. Focus on subreddits that trigger false positives often.",
+              "Posts from untrained subreddits",
+            ],
+            [
+              "Kai",
+              "Twitter posts pre 2020. Includes normal and real scam/spam posts.",
+              "200+ Twitter posts of varying topics",
+            ],
+            [
+              "ucirvine sms",
+              "SMS scam/spam messages",
+              "N/A",
+            ],
+            [
+              "ealvardob phishing",
+              "Phishing scam/spam",
+              "N/A",
+            ],
+            [
+              "Manaul fp",
+              "Posts that triggered false postives from V1.5 and V1.0. Includes Reddit, Twitter and LinkedIn.",
+              "Some more false positives (not technically an OOD, but helpful)",
+            ],
+            [
+              "Synthetic Gemini Example",
+              "Gemini-generated scam messages (of varying types)",
+              "N/A",
+            ],
+            [
+              "Russian Trolls", 
+              "Malicous bot posts. Specifically for OOD testing",
+              "About 100 samples from the dataset."
+            ],
+          ],
+        },
+      },
+      {
+        text: "The site that made these issues V1.5 had most obvious was on LinkedIn. Due to most posts linking, advertising, or announcing something it completely tripped up the model. " +
+        "I wish I was able gather hundreds of false positives on LinkedIn, or LinkedIn posts in large batches. Unfortunatly, that data is either free but time consuming through manually grabbing posts, or fast but costly due to buying datasets. ", 
+      },
+      {
+        text: "I believe lot of positive and negative LinkedIn style example posts would've really improved the model much more on that platform (similar to how webis and kai improved the AI-text classifier for V2 on Reddit and Twitter). " + 
+        "Future training will likely include even more LinkedIn posts to prevent false positives. Below are the results from training and testing:"
+      },
+      {
+        media: {
+          kind: "image",
+          src: "public/images/v2_scam_class_report.png",
+          alt: "Investi-gator's AI-Text Detector OOD Eval in 0.5 threshold",
+          caption: "Classification report after training",
+          ratio: "100 / 50",
+          fit: "contain",
+        },
+      },
+      {
+        media: {
+          kind: "image",
+          src: "public/images/v2_scam_ood.png",
+          alt: "Investi-gator's AI-Text Detector OOD Eval in 0.5 threshold",
+          caption: "OOD testing results",
+          ratio: "1331 / 300",
+          fit: "contain",
+        },
+      },
+      {
+        text: "Compared to AI-Text, V2 scam shows clear understanding of it's training data. You may be wondering why I included a dataset named 'Russian trolls' for OOD testing. Something that I need to figure out regarding scam detection in general is what malicious patterns the current model is able to notice, what it "+
+        "incorrectly notices, and what it can't notice. Russian trolls isn't a good training dataset for this model due to it's subjects not having a negative (not spam) counterpart. If I were to include it, " +
+        "the model could very well assume that political posts or certain mentioned names equals 'Scam' which isn't true. "
+      },
+      {
+        text: "While unfit for training, it allows me to get an idea of the strengths an weakness of the model, and based on the OOD testing, the V2 Scam detector cannot detect malicous bots as shown in the examples from Russian Trolls. " +
+        "Eventually, I will test the scam detector on more untrained datasets to see how it performs."
+      },
+      {
+        heading: "New Updates",
+        items: [
+          "V2 Scam Detector (as stated before)",
+          "The extension now can't process posts that are not mostly English. The models cannot process languages other than English, so posts containing other language are always falsely flagged.",
+          "Model Migration to Hugging Face Hub (More infromation below).",
+          "Indicator on popup when models are running through posts.",
+          "UI updates for the settings and popup regarding model migration (download icons, bars, buttons). When LinkedIn inference is fully operational, I'll make a new demo video,",
+          "New settings features (not all operational currently)."
+        ]
+      },
+      {
+        media: {
+          kind: "image",
+          src: "public/images/loading-bars.png",
+          alt: "Model loading bars",
+          caption: "Popup visuals when models first download",
+          ratio: "100 / 50",
+          fit: "contain",
+        },
+      },
+      {
+        heading: "About Model Migration",
+        text: "As Investi-gator continues in development, I have to think more and more about how others will be able to access the extension and these models. " +
+        "Making users manually download the models in their device storage and add it into the logic is not optimal. Instead I opted to have the extension download the models to browser storage from Hugging Face " +
+        "Hub (just like the model demo). It still runs exactly the same and inference is still local once downloaded. This way, users won't have to go to great lengths to use the model for this project and for other projects."
+      },
+      {
+        text: "Just like the demo, the models can be removed from your browser storage at any time. I also plan to have an option for inference via a server if you don't want to download the models for whatever reason (Maybe Google Cloud). " +
+        "That will likely be the last step to come before Investi-gator goes live. I can't say whether or not they'll be certain limits to that."
+      },
+      {
+        text: "Since both the Extension and documentation are now using HF Hub, I've been working on the documentation for the models there. Check them out on my [Hugging Face profile](https://huggingface.co/bthomas279)."
+      },
+    ],
+     /* Currently working on */
+    whatsNext: [
+      "Get LinkedIn fully operational. Afterwards I'm putting a pause in developement for the next week or two. I have other obligations I need to attend to at the moment.",
+      "When I come back from break I will start data gathering and training for AI-Image detection. Looking forward to this one, but it will be very time consuming.",
+      "Development is going pretty slow since I'm the solo developer of this project. I still have 2 more models to tune, at least 1 to improve, and I still need to get inference on " +
+      "Facebook working (plus other stuff). I've been looking into the possibility of recuriting a couple other developers to help speed up development. Not sure if I will follow through with that, but if you're interested, let me know on [LinkedIn](https://www.linkedin.com/in/bthomas04/)."
+    ],
+  },
   {
     type: "minor",
     kicker: "Small Update / Patch Notes",
@@ -151,7 +312,7 @@ var UPDATES = [
     thumb: {
       src: "public/images/steam-example.png",
       alt: "Picture of AI-text V2",
-      ratio: "1300 / 400",
+      ratio: "1200 / 800",
     },
     excerpt:
       "It took a long time, but Version 2 of the AI Text detector has finally been trained and tested. This model version is by far the one I spent the most time optimizing. " +
@@ -164,8 +325,6 @@ var UPDATES = [
       },
       {
         table: {
-          caption:
-            "Positive classifications on the same reddit/twitter cross-reference sample.",
           headers: ["Dataset", "Contents", "OOD"],
           rows: [
             [
@@ -437,7 +596,7 @@ var UPDATES = [
 
     sections: [
       {
-        heading: "W",
+        heading: "Contents",
         items: [
           "A demo video walking through passive detection on a live feed.",
           "Screenshots of the badges, the badge popup, and the extension popup.",

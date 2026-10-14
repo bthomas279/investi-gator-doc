@@ -117,8 +117,9 @@
   outline: none;
 }
 
-/* Major variant: thumbnail beside the copy */
-.update-card.is-major { display: grid; grid-template-columns: 240px 1fr; }
+/* Major variant: thumbnail beside the copy. --thumb-width is set per card
+   by main.js from an update's `thumb.width`. */
+.update-card.is-major { display: grid; grid-template-columns: var(--thumb-width, 240px) 1fr; }
 
 .update-thumb {
   aspect-ratio: 16 / 9;

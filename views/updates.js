@@ -131,46 +131,66 @@
    ========================================================================== */
 var UPDATES = [
   {
-    type: "minor",
-    kicker: "Small Update / Patch Notes",
-    title: "Patch 0.4.0: BIG logic cleanup + future steps ",
-    date: "2026-11-09",
+    type: "major",
+    kicker: "Major Update",
+    title: "Patch 0.4.0: BIG logic cleanup + couple new features, future steps. ",
+    date: "2026-11-16",
+    thumb: {
+      src: "public/images/delete_cache_setting.png",
+      alt: "Picture of cache setting",
+      ratio: "800 / 600",
+    },
     excerpt:
-      "It's been almost a month since my last update, and unfortunately, I don't have many noticable changes or improvements to share. " +
-      "For the most part, I've been working on a big cleanup of the general code logic for the past few weeks. I've basically been re-organizing and re-structuring " +
-      "all of the methods, functions, and flow in order to improve readability, reduce redundancy, and to prepare the extension for new future features. " +
+      "It's been over a month since my last update, and fortunatly that month was spent in good use. " +
+      "For the most part, most of that time was spent completing finished a big cleanup of the general code logic. I've basically been re-organizing and re-structuring " +
+      "all of the methods, functions, and flow in order to improve readability, reduce redundancy, debugging, and to prepare the extension for new future features. " +
       "This all has been fueled by my experiences volunteering with other organizations. I've been exposed to how the stucture of a project should look like, and I'm hoping " +
       "this cleanup will help make Investi-gator more official and easier to develop in the future.",
     
     sections: [
       {
-        heading: "Why the slow down?",
-        text: "If you've been following Investi-gator for a while, you may have noticed a slowdown in updates, improvements, and features. " +
-        "All of that is true, and it's because of a mixture of things. Obligations such as courses, job applications, clubs, and volunteering all eat up my time nowadays. " +
-        "There's also the fact that I'm still new to software development. Information Science barely covers anything in that field, meaning I have to also self learn software dev too. ",  
+        heading: "New features:",
+        items: [
+          "Users can now download the classificaiton and reasoning cache from chrome storage. The caches hold the post text, model classification/reasoning outputs, " +
+          "and some other stuff like the platform. It's mainly meant for me since it could be helpful with finding potential classification patterns with the models, but data analysts may also find it helpful.",
+          "The caches are now saved in chrome local storage. This means that both caches won't clear when your browser closes anymore. Of course, you can delete your cache in the settings too. This can take up space, so I plan on creating an option to save " +
+          "the caches in local storage or just keep them in session storage (deletes when the session ends)."
+        ]
+        
       },
       {
-        text: "I knew Investi-gator was a huge leap and I purposely made it that way by design. However, as new platforms become compatable with Investi-gator, as new features are implemented, and as I realize " +
-        "how complex this application needs to be to achieve its goals, I found that being able to run with this project every step of the way to be very challenging at my current knowledge level.",
+        media: {
+          kind: "image",
+          src: "public/images/delete_cache_setting.png",
+          alt: "Cache Settings",
+          caption: "Current look of the new settings (the local/server option is not operational). UI is not final.",
+          ratio: "100 / 50",
+          fit: "contain",
+        },
       },
       {
-        text: "So why not have AI do everything? While I'm not against using AI assistants to help develop applications, AI is bad at planning ahead. It can implement a new feature quickly, but it cannot deal with big overarching tasks such as " +
-        "project management or architecting. That is how you get hidden bugs and security flaws. While model fine-tuning has always been 90% my own planning, I do not " + 
-        "like just how much AI is dictating Investi-gator's software logic currently. Not to mention that this project is naturally one of the biggest talking pieces on my portfolio. " + 
-        "If I cannot explain/replicate a majority of this project's methodology, I'd be in a pretty big pickle.",
-      },
-      {
-        heading: "Future Plans",
-        text: "Firstly, I'm taking a long break from this project's software. This cleanup is the last update I will be making to it for the better part of 1-2 months. Potentially more. " + 
-          "I'll be using this time to teach myself software dev strategies as well as polishing my knowledge on Python, TypeScript, and JavaScript. " + 
-          "I'll also spend a small portion of that time working on the AI side of the project since that's something I'm much more confident with. I'm still looking to improve the scam and AI Text classifier, as " +
-          "well as finally tuning V1 of the AI image classifier. However, the actual incorperation of that model would have to wait until I'm confident enough to get back to software dev. ",
+        text: "In just a couple of weeks Investi-gator will be 6 months in development, which would officially pass the development span of my last project. " +
+        "I'm very proud to have been dedicated to this project for so long, but I don't like the idea of gatekeeping it until it's 100% complete at the rate it's going. So, I will hopefully release it SOON!"
       },
       {
         heading: "About Investi-gator's Release",
-        text: "I think it's pretty clear that Investi-gator will likely not become available to use by the end of the fall semester. I do think it's about time that I package this project up and release it " +
-        "and just provide version updates in the future. What's holding me back is the models and LinkedIn; who currently are not good enough to release. Once the issues within them are mostly fixed, I will think more about release. "  
+        text: "I think it's pretty clear that Investi-gator will likely not be finished by the end of the fall semester. It was a bit unrealistic to expect myself finish it on time with the quality " +
+        "I want it to have. I was expecting this to happen, so for the past couple months I purposely set myself up to where I can open the extension whenever I want. I think you waited long enough, so once I finish a few things I'll release it and periodically provide it updates (like other models, new platforms, etc.). ",
       },
+      {
+        text: "Currently, the plan prior to release is to improve the scam and AI text classifier enough to where I'm very satisfied with them, do another round of software debugging and UI upgrades, and heavily update the documentation " +
+        "on the GitHub repo, HF model repos, and the docs website. Once those three things are finished, here's how release will likely go: ", 
+        items: [
+          "Edge will not be 100% compatible: Unfortunately for some reason Edge stopped being fully compatible with Investi-gator since July and I have no clue why. You can still try to use it there but it'll likely not work on some social media platforms. ",
+          "I will open Investi-gator's GitHub and I will give you steps for how to unpack it on chrome by yourself.",
+          "For you non-technical folks, I will aim to get Investi-gator approved and published on the Chrome Extension store platform! " +
+          "Unfortunately, hand-held IOS/Android devices mostly do not support chrome extensions.",
+          "I will periodically update Investi-gator. Not sure how often, but I'll make sure all of the features advertised are eventually implemented."
+
+
+        ]
+      },
+      
     ]
   },
   {

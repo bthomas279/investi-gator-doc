@@ -41,45 +41,7 @@
     });
   }
 
-  /* Active nav link ------------------------------------------------------
-     Highlight the nav link whose section is currently in view. */
-  function initActiveNav() {
-    if (!("IntersectionObserver" in window)) return;
-
-    var links = Array.prototype.slice.call(
-      document.querySelectorAll('.nav-links a[href^="#"]')
-    );
-    if (!links.length) return;
-
-    var byId = {};
-    var sections = [];
-
-    links.forEach(function (link) {
-      var id = link.getAttribute("href").slice(1);
-      var section = document.getElementById(id);
-      if (!section) return;
-      byId[id] = link;
-      sections.push(section);
-    });
-
-    if (!sections.length) return;
-
-    function setActive(id) {
-      links.forEach(function (link) {
-        link.classList.toggle("is-active", link === byId[id]);
-      });
-    }
-
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) setActive(entry.target.id);
-      });
-    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
-
-    sections.forEach(function (section) {
-      observer.observe(section);
-    });
-  }
+  /* The nav (active link, hamburger, sliding pill) lives in backend/nav.js. */
 
   /* Detection badges -----------------------------------------------------
      Paint the sample badges using the extension's real BADGE_STYLES
@@ -618,7 +580,6 @@
     initTechStack();
     initUpdates();
     initScrollReveal();
-    initActiveNav();
     initYear();
   }
 

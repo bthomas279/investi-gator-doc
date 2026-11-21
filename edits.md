@@ -5,6 +5,173 @@ added, and why. Newest first.
 
 ---
 
+## 2026-11-17 (idea 4) — Confidence meters and count-ups
+
+- **Two-sided meter in each detector row** (`meter()` in `render.js`).
+  The middle line is "unsure" (50%). The fill grows right, in the
+  detector's color (scam red, AI-text blue), when it detected, and left,
+  in green, when it didn't. So "not detected · 98%" visibly points toward
+  clean. The fill length is computed from `confidence`, the same number
+  the row prints, so they can't disagree.
+- **Percentages roll up from 50%**, on the badge and on the row, as the
+  results arrive. 50% is where these models' confidence starts, so the
+  count never shows a number the model can't produce. It always lands on
+  the exact text render.js wrote. `aria-busy` on the results area makes
+  screen readers wait and read only the final values.
+- **Word-importance bars grow in**, strongest word first.
+- Layout: the rows are `name | meter | state | value` on wider screens.
+  At 560px and down the meter gets its own full-width line.
+- Reduced motion: final values and full bars right away.
+
+## 2026-11-17 (fix) — Reasoning stuck after the cleanup bundle
+
+**Cause:** the cleaned-up bundle renamed the keys its reasoning comes back
+under, `attributions` → `lime_attributions` and `scan` → `sw_scan`.
+`engine.js` only knew the old names, so it handed render.js the wrapper
+object instead of the data. render.js crashed drawing it, and because that
+happened after the clock had stopped, the panel froze on "processing" at
+0s. Every redraw of the results hit the same crash, so the scam panel got
+stuck too. The LIME and sentence-scoring logic itself is unchanged.
+
+**Fix:**
+- `engine.js` accepts both names (`REASON_KEYS`, newest first). If the
+  bundle sends a shape it doesn't recognize, it now fails right there
+  with a message naming the keys it got, instead of passing the bad data
+  on to render.js.
+- It also translates two names that never matched, even with the old
+  bundle: `totalSentances` → `total` (the AI-text head would have said
+  "3 of undefined sentences") and band `bits` → `traces`.
+- `controller.js`: a panel the renderer can't draw now shows an error in
+  that panel only, instead of freezing every panel.
+- `mock-engine.js` now uses the bundle's real names, so the stand-in tests
+  the translation instead of skipping it. That mismatch is why these bugs
+  never showed up in testing.
+
+**Verified against the real bundle and models** (headless Chrome, fresh
+download, 48s to load): both reasonings complete and render.
+
+**Still true, and not a page bug:** while LIME runs, the page's main thread
+is blocked for several seconds (one probe waited 4.4s for a reply), so the
+seconds counter can't tick until it finishes. See the note to the developer
+in the conversation about yielding between model passes in the private repo.
+
+## 2026-11-17 (newest) — Demo page: watching the models work
+
+Three illustrations of what the models are doing. All three are labeled
+as illustrations in the code: the bundle reports no progress, so the order
+and timing are made up, and the seconds counter stays the only real number.
+
+| Moment | What you see |
+|---|---|
+| Analyze clicked | The post appears right away with a light sweeping down it. One row per detector, with a dot pulsing in that detector's badge colors. |
+| Results arrive | Badges spring onto the post one after another. The detector rows settle. |
+| Scam reasoning running | The post redrawn with random groups of words fading out and back in, which is what LIME does. |
+| AI-text reasoning running | A blue highlight moves through the sentences one at a time, as if each is being scored. |
+| Reasoning finished | Scored sentences / ranked words fade in in order. |
+
+**New file:** `backend/playground/animate.js` holds all the JavaScript
+motion, so `render.js` stays pure markup and `controller.js` stays about
+state. The looping illustrations use the browser's built-in
+`element.animate()`, which runs opacity animations off the main thread.
+That matters here because the models run ON the main thread, and these
+loops play exactly while the models are busy.
+
+**Controller changes, all small:**
+- **The reasoning clock now ticks only its own text** (`.pg-elapsed`).
+  Before, it rebuilt the whole panel every second, which would have
+  restarted the illustration every second.
+- **`nextPaint()` before model work.** It lets the browser draw the
+  scanning view and start its animations before the main thread gets busy.
+  Without it the scan would never appear.
+- **`MIN_SCAN_MS = 900`.** The scan stays up at least that long, because a
+  fast classification would otherwise flash it for a split second. It's
+  cosmetic; set it to 0 to show results instantly.
+- **On phones, Analyze scrolls the results into view**, so the scan is on
+  screen to watch.
+
+Reduce motion, no Motion library, or no animation support: same content,
+no movement.
+
+## 2026-11-17 (latest) — Nav layouts settled
+
+The final order, which replaces the tables in both entries below:
+
+| Width | Layout |
+|---|---|
+| 861px and up | links in a row, theme button, sliding pill |
+| 561–860px | brand + theme button on top, swipeable strip below, sliding pill |
+| 560px and down | brand, theme button, hamburger; links in a dropdown panel |
+
+**Hamburger line fix.** One of the three bars used to look thicker. The
+bars were 5px apart, and with display scaling (Windows at 125%, phones) a
+CSS pixel isn't a whole screen pixel, so each bar landed on a different
+fraction of one. They're now 8px apart, which is a whole number of screen
+pixels at every common scale. Checked at 125% and 150%. The reason is
+written next to the rule in `nav.css` so the spacing doesn't get
+"tidied" back.
+
+## 2026-11-17 (later) — Theme button, stronger aurora
+
+- ~~**No more hamburger.**~~ Reversed in the entry above: the hamburger is
+  back, for phone widths only.
+- **Light/dark button** in the nav (`backend/theme.js`, new, loaded in
+  `<head>` so the page never flashes the wrong theme). Until a visitor
+  clicks it, the site follows their device setting. After that, their
+  choice is remembered on that device (`localStorage` key `ig-theme`).
+  The light colors in `main.css` moved from `@media (prefers-color-scheme:
+  light)` to `:root[data-theme="light"]`. Without JavaScript the site shows
+  the dark theme.
+- **Aurora is visible now.** Brighter glows, 18s/23s loops instead of
+  28s/37s, and roughly twice the travel distance. Tuning notes are next to
+  the keyframes in `background.css` and the `--aurora-*` tokens in
+  `main.css`.
+
+## 2026-11-17 — Animated background, responsive nav, Motion
+
+### Background (`public/background.css`, new)
+
+- **Aurora:** two slow-drifting layers of soft green/blue glow behind
+  every page, pinned to the screen.
+- **Scan grid:** a faint grid behind the index hero, with a light line that
+  sweeps down it every 7 seconds. The hero's original glow moved here from
+  `main.css`.
+- Only `transform`/`opacity` are animated, because the browser runs those
+  off the main thread. That matters on the playground, where the models run
+  ON the main thread and would freeze anything driven by JavaScript.
+- Colors are tokens in `main.css` (`--aurora-*`, `--grid-line`, `--scan-*`),
+  with separate light-mode values. To make the effect stronger or weaker,
+  change the alpha numbers there.
+
+### Nav (`public/nav.css` + `backend/nav.js`, both new)
+
+One set of markup, three layouts by width:
+
+| Width | Layout |
+|---|---|
+| 861px and up | links in a row, sliding pill behind the active one |
+| 561–860px | hamburger button, dropdown panel |
+| 560px and down | swipeable tab strip under the brand, with the pill |
+
+- Before this, phones under 640px had **no nav links at all**.
+- The breakpoints exist only in `nav.css`. `nav.js` asks the page which
+  layout is showing, so there is only one place to change them.
+- Active-section tracking moved from `main.js` into `nav.js`, since the
+  pill needs it on both pages. Scrolling back to the hero now clears the
+  highlight instead of leaving the last section lit.
+- `html { scroll-padding-top }` stops jump links from landing under the
+  sticky bar, which is two rows tall in the strip layout.
+
+### Motion
+
+Loaded from jsDelivr, pinned to `motion@14.8.0` with an integrity hash, so
+a changed file is refused. It drives the pill's spring and the staggered
+menu links. **If it fails to load, the nav still works**, using a plain CSS
+transition (the `.no-motion` class). The full browser build is ~178 KB raw
+(~55 KB over the wire) and is cached after the first visit. To remove it,
+delete the two `<script>` tags and nothing breaks.
+
+---
+
 ## 2026-09-07 — Storage is now visible, optional, and reversible
 
 ### What "the browser caches the models" actually meant

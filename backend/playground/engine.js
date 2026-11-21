@@ -32,11 +32,18 @@
       across InvestiGator.detectors here.
 
    3. reason() returns a wrapper, not the payload:
-        scam -> { attributions: WordAttribution[] }
-        text -> { scan: SentenceScan | null }   (null when the text is too
-                                                 short to split into sentences)
-      render.js is given the unwrapped payload, and the null case is a real
-      state the page has to show rather than an error.
+        scam -> { lime_attributions: WordAttribution[] }
+        text -> { sw_scan: SentenceScan | null }   (null when the text is
+                                                    too short to split)
+      Before the Nov 2026 cleanup these were { attributions } and { scan };
+      both spellings are accepted (see REASON_KEYS below). render.js is given
+      the unwrapped payload, and the null case is a real state the page has
+      to show rather than an error.
+
+      The bundle's SentenceScan also names two fields differently from the
+      page: `totalSentances` (spelled that way in the bundle) where the page
+      says `total`, and band "bits" where the page says "traces".
+      normaliseScan() translates, so render.js has one vocabulary.
 
    Progress comes from transformers.js as ProgressInfo
    ({ status, file, loaded, total, progress }) and is normalised here into
@@ -206,14 +213,61 @@ window.PlaygroundEngine = (function () {
     });
   }
 
+  /* The wrapper key each detector's reasoning arrives under, newest name
+     first. When the bundle renames one, add the new name to the front of
+     its list; keeping the old one costs nothing. */
+  var REASON_KEYS = {
+    text: ["sw_scan", "scan"],
+    scam: ["lime_attributions", "attributions"],
+  };
+
+  /* A reply in a shape we don't recognise fails HERE, loudly and with the
+     keys it actually had, rather than being passed on to render.js. Passing
+     it on is how a renamed key froze the reasoning panel: the renderer
+     choked on the unfamiliar shape after the clock had already stopped. */
+  function unwrap(type, payload) {
+    var keys = REASON_KEYS[type] || [];
+    for (var i = 0; i < keys.length; i++) {
+      if (payload && Object.prototype.hasOwnProperty.call(payload, keys[i])) {
+        return payload[keys[i]];
+      }
+    }
+    throw new Error(
+      "the detection bundle sent " + type + " reasoning in a shape this page " +
+      "doesn't recognise (keys: " + (Object.keys(payload || {}).join(", ") || "none") +
+      "). REASON_KEYS in backend/playground/engine.js needs the new name."
+    );
+  }
+
+  /* The bundle's SentenceScan -> the page's. null stays null: a post too
+     short to split into sentences is a normal outcome, not an error. */
+  function normaliseScan(scan) {
+    if (scan === null) return null;
+    if (!scan || !Array.isArray(scan.sentences)) {
+      throw new Error("AI-text reasoning came back without its list of sentences.");
+    }
+    var total = scan.total != null ? scan.total
+      : scan.totalSentances != null ? scan.totalSentances
+      : scan.sentences.length;
+    return {
+      sentences: scan.sentences,
+      flagged: scan.flagged,
+      total: total,
+      aiFraction: scan.aiFraction,
+      band: scan.band === "bits" ? "traces" : scan.band,
+    };
+  }
+
   /* Returns the unwrapped payload: a SentenceScan (or null) for "text",
      a WordAttribution[] for "scam". */
   async function reason(type, text) {
     if (!state.loaded) throw new Error("models are not loaded yet");
-    var payload = await impl.reason(type, text);
-    if (!payload) return null;
-    if (type === "text") return payload.scan === undefined ? payload : payload.scan;
-    return payload.attributions || payload;
+    var data = unwrap(type, await impl.reason(type, text));
+    if (type === "text") return normaliseScan(data);
+    if (!Array.isArray(data)) {
+      throw new Error("Scam reasoning came back without its list of words.");
+    }
+    return data;
   }
 
   return {

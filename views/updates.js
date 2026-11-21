@@ -142,10 +142,10 @@ var UPDATES = [
     },
     excerpt:
       "It's been over a month since my last update, and fortunatly that month was spent in good use. " +
-      "For the most part, most of that time was spent completing finished a big cleanup of the general code logic. I've basically been re-organizing and re-structuring " +
+      "For the most part, most of that time was spent completing a big cleanup of the general code logic. I've basically been re-organizing and re-structuring " +
       "all of the methods, functions, and flow in order to improve readability, reduce redundancy, debugging, and to prepare the extension for new future features. " +
       "This all has been fueled by my experiences volunteering with other organizations. I've been exposed to how the stucture of a project should look like, and I'm hoping " +
-      "this cleanup will help make Investi-gator more official and easier to develop in the future.",
+      "this cleanup will help make Investi-gator more official and easier to develop in the future. The docs are also using the cleaned logic bundle too.",
     
     sections: [
       {

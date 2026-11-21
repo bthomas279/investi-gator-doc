@@ -20,6 +20,7 @@
   var IG = window.IGShared;
   var Render = window.PlaygroundRender;
   var Engine = window.PlaygroundEngine;
+  var Animate = window.PlaygroundAnimate;
 
   /* Both detectors are configured with maxLength: 256 tokens. English runs
      roughly four characters per token, so 1000 characters is about 250
@@ -28,15 +29,21 @@
 
      It also bounds LIME, whose cost scales with word count. An unbounded
      paste is how you get a thirty-second explanation. */
-  var MAX_CHARS = 1000;
+  var MAX_CHARS = 1500;
 
   /* A recommendation, not a rule. Short posts still classify, they just
      give the models less to work with, so the page says so and lets the
      user decide. Nothing is disabled by this number. */
   var RECOMMENDED_CHARS = 80;
 
+  /* The shortest time the "Analyzing…" scan stays on screen. Classifying
+     can finish in a fraction of a second, which would make the scan a
+     confusing flicker. Purely cosmetic; set it to 0 to show results the
+     moment they exist. */
+  var MIN_SCAN_MS = 900;
+
   var root = document.getElementById("playground");
-  if (!root || !IG || !Render || !Engine) return;
+  if (!root || !IG || !Render || !Engine || !Animate) return;
 
   var el = {
     banner: root.querySelector("#pg-banner"),
@@ -53,6 +60,7 @@
     // checking | idle | loading | ready | classifying | results | error
     phase: "checking",
     text: "",
+    pendingText: "",        // what is being classified right now
     results: null,
     reasoning: {},          // type -> { phase, data, startedAt, error }
     loadProgress: null,
@@ -82,6 +90,26 @@
      discarded, which needs no cooperation from the bundle. */
   var generation = 0;
   var reasonToken = {};
+
+  /* Resolves once the browser has drawn what render() just put on screen.
+     The models run on this same thread, so without this pause the scanning
+     view would never be drawn before the heavy work starts, and the CSS
+     animations need one drawn frame to get going. The timer is a backstop
+     for background tabs, where animation frames don't fire. */
+  function nextPaint() {
+    return new Promise(function (resolve) {
+      var done = false;
+      function finish() {
+        if (!done) { done = true; resolve(); }
+      }
+      requestAnimationFrame(function () { setTimeout(finish, 0); });
+      setTimeout(finish, 100);
+    });
+  }
+
+  function wait(ms) {
+    return new Promise(function (resolve) { setTimeout(resolve, Math.max(0, ms)); });
+  }
 
   /* ---- rendering -------------------------------------------------------- */
 
@@ -212,21 +240,26 @@
     var r = state.reasoning[type];
     if (!r || r.phase === "idle") return "";
     if (r.phase === "running") {
-      return Render.working(
-        type === "scam" ? "running LIME over word perturbations" : "scoring sentences",
-        Date.now() - r.startedAt
-      );
+      return Render.reasoningWork(type, state.results.text, Date.now() - r.startedAt);
     }
     if (r.phase === "error") {
       return '<p class="pg-error">Could not investigate this one: ' +
         IG.escapeHtml(r.error) + "</p>";
     }
-    if (type === "text") {
-      // A null scan means the post was too short to split into sentences —
-      // a normal outcome, not an error.
-      return r.data ? Render.sentenceScan(r.data) : Render.scanUnavailable();
+    /* Every result panel is redrawn together, so one reply the renderer
+       can't draw would otherwise break all of them and leave the page stuck
+       on "processing". Contained here, it costs only its own panel. */
+    try {
+      if (type === "text") {
+        // A null scan means the post was too short to split into sentences —
+        // a normal outcome, not an error.
+        return r.data ? Render.sentenceScan(r.data) : Render.scanUnavailable();
+      }
+      return Render.wordAttributions(r.data);
+    } catch (err) {
+      return '<p class="pg-error">Could not display this reasoning: ' +
+        IG.escapeHtml((err && err.message) || "unknown error") + "</p>";
     }
-    return Render.wordAttributions(r.data);
   }
 
   function renderResults() {
@@ -234,6 +267,10 @@
 
     if (state.phase === "error") {
       el.results.innerHTML = '<p class="pg-error">' + IG.escapeHtml(state.error) + "</p>";
+      return;
+    }
+    if (state.phase === "classifying") {
+      el.results.innerHTML = Render.scanning(state.pendingText, Engine.detectorIds());
       return;
     }
     if (!state.results) {
@@ -279,6 +316,10 @@
         ? why
         : '<p class="pg-clean-note">Both detectors ran and neither flagged ' +
           "this post.</p>");
+
+    // The rebuild above replaced any running illustration with a new,
+    // still copy; start it moving again.
+    Animate.illustrate(el.results);
   }
 
   function render() {
@@ -323,11 +364,23 @@
     generation += 1;
     var gen = generation;
     state.phase = "classifying";
+    state.pendingText = text;
     state.reasoning = {};
     render();
 
+    // On a phone the results sit below the fold; bring the scan into view
+    // so there's something to watch. Does nothing if it's already visible.
+    el.results.scrollIntoView({
+      block: "nearest",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+    });
+
+    await nextPaint();
+    var startedAt = Date.now();
+
     try {
       var list = await Engine.classify(text);
+      await wait(MIN_SCAN_MS - (Date.now() - startedAt));
       if (gen !== generation) return;
       state.results = { text: text, list: list };
       state.phase = "results";
@@ -337,6 +390,7 @@
       state.error = "Classification failed. " + (err && err.message ? err.message : "");
     }
     render();
+    if (state.phase === "results") Animate.resultsIn(el.results);
   }
 
   async function explain(type) {
@@ -348,18 +402,22 @@
       return gen !== generation || token !== reasonToken[type];
     }
 
-    state.reasoning[type] = { phase: "running", startedAt: Date.now() };
+    var startedAt = Date.now();
+    state.reasoning[type] = { phase: "running", startedAt: startedAt };
     renderResults();
 
     /* The clock has to be driven from here because the engine reports no
-       reasoning progress. Scoped to the one panel: re-rendering the whole
-       result block every second would pull focus off the button that
-       started it. */
-    var slot = document.getElementById("pg-reason-" + type);
+       reasoning progress. It touches only the seconds text: rebuilding the
+       panel would restart its illustration every second and pull focus off
+       the button that started it. Looked up on every tick because clicking
+       the other detector's button rebuilds the panel. */
     var ticker = setInterval(function () {
       if (stale()) return clearInterval(ticker);
-      if (slot) slot.innerHTML = reasonPanelInner(type);
+      var clock = root.querySelector("#pg-reason-" + type + " .pg-elapsed");
+      if (clock) clock.textContent = Math.floor((Date.now() - startedAt) / 1000) + "s";
     }, 1000);
+
+    await nextPaint();
 
     try {
       var data = await Engine.reason(type, state.results.text);
@@ -375,6 +433,9 @@
       clearInterval(ticker);
     }
     renderResults();
+    if (state.reasoning[type].phase === "done") {
+      Animate.reasoningIn(document.getElementById("pg-reason-" + type));
+    }
   }
 
   /* Frees the disk without ending the session: the instantiated models live

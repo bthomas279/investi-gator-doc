@@ -283,9 +283,13 @@
   gap: 6px;
 }
 
+/* name | meter | state | value. Fixed outer columns so the meters line up
+   from row to row. Phones stack the meter on its own line (see the bottom
+   of this file). */
 .pg-verdict {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 4.5rem minmax(0, 1fr) 6rem 2.75rem;
+  grid-template-areas: "name meter state value";
   gap: 12px;
   align-items: center;
   padding: 9px 12px;
@@ -300,13 +304,89 @@
   color: var(--text);
 }
 
-.pg-verdict-name { font-weight: 600; }
+.pg-verdict-name { grid-area: name; font-weight: 600; }
 
-.pg-verdict-state { font-size: 0.82rem; }
+.pg-verdict-state { grid-area: state; font-size: 0.82rem; text-align: right; }
 
 .pg-verdict.is-hit .pg-verdict-state { color: var(--accent); }
 
-.pg-verdict-value { font-variant-numeric: tabular-nums; }
+/* tabular-nums keeps the digits the same width, so the count-up doesn't
+   jitter sideways. */
+.pg-verdict-value { grid-area: value; font-variant-numeric: tabular-nums; text-align: right; }
+
+/* While classifying, a row is just name | "checking" | pulsing dot. */
+.pg-verdict.is-pending {
+  grid-template-columns: 1fr auto auto;
+  grid-template-areas: none;
+}
+
+.pg-verdict.is-pending > * { grid-area: auto; }
+
+/* Two-sided confidence meter ----------------------------------------------
+   The middle line is "unsure" (50%). The fill grows out from it: right,
+   in the detector's color, when it detected; left, in green, when it
+   didn't. --lean (0–1) is set inline by render.js. animate.js grows the
+   fill from the middle with scaleX, which is why each side's
+   transform-origin is the middle edge. */
+.pg-meter {
+  grid-area: meter;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  --toward: var(--warn);
+}
+
+.pg-meter[data-type="scam"] { --toward: var(--danger); }
+.pg-meter[data-type="text"] { --toward: var(--ai); }
+
+.pg-meter-end {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.pg-meter-track {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--card-border);
+  overflow: hidden;
+}
+
+/* The "unsure" line down the middle. */
+.pg-meter-track::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  left: calc(50% - 1px);
+  width: 2px;
+  background: var(--text-dim);
+  opacity: 0.5;
+}
+
+.pg-meter-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(var(--lean) * 50%);
+}
+
+.pg-meter-fill.is-toward {
+  left: 50%;
+  background: var(--toward);
+  border-radius: 0 999px 999px 0;
+  transform-origin: left center;
+}
+
+.pg-meter-fill.is-away {
+  right: 50%;
+  background: var(--accent);
+  border-radius: 999px 0 0 999px;
+  transform-origin: right center;
+}
 
 .pg-verdict-note {
   margin: 10px 0 0;
@@ -422,11 +502,13 @@
   overflow: hidden;
 }
 
+/* animate.js grows these from the left with scaleX as the list appears. */
 .pg-word-bar span {
   display: block;
   height: 100%;
   width: calc(var(--w) * 100%);
   border-radius: 999px;
+  transform-origin: left center;
 }
 
 .pg-word.is-toward .pg-word-bar span { background: var(--danger); }
@@ -453,6 +535,87 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pg-progress-bar.is-indeterminate span { animation: none; width: 100%; opacity: 0.5; }
+}
+
+/* Processing visuals --------------------------------------------------------
+   Shown while the models work. Everything that loops here animates only
+   `transform` or `opacity`, which the browser runs off the main thread, so
+   it keeps moving while the models (which run ON the main thread) are busy.
+   The reasoning illustrations' movement comes from
+   backend/playground/animate.js; these rules are just their look. */
+
+/* "Analyzing…": a light sweeps down the post, top to bottom, like it's
+   being read. The layer is the post's full height with the bright line on
+   its bottom edge; sliding it from -100% to 0 carries the line down. */
+.pg-post.is-scanning {
+  position: relative;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--card-border));
+}
+
+.pg-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    transparent 60%,
+    color-mix(in srgb, var(--accent) 12%, transparent) 94%,
+    color-mix(in srgb, var(--accent) 60%, transparent) 100%);
+  transform: translateY(-100%);
+  animation: pg-scan 1.7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes pg-scan {
+  to { transform: translateY(0); }
+}
+
+/* One dot per detector, in that detector's badge colors, pulsing while it
+   checks. The second dot runs half a beat behind so they alternate. */
+.pg-verdict.is-pending { color: var(--text-dim); }
+
+.pg-pulse {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--dot-bg, var(--accent-glow));
+  border: 2px solid var(--dot-fg, var(--accent));
+  animation: pg-pulse 1s ease-in-out infinite;
+}
+
+.pg-verdict.is-pending:nth-child(even) .pg-pulse { animation-delay: -0.5s; }
+
+@keyframes pg-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.7); }
+  50%      { opacity: 1;   transform: scale(1.1); }
+}
+
+/* Reasoning illustrations: the post redrawn while reasoning runs. Keeps
+   the post's line breaks so it reads as the same text. */
+.pg-illustration {
+  white-space: pre-wrap;
+  margin-bottom: 14px;
+}
+
+/* inline-block so each word can animate on its own without the browser
+   re-laying out the paragraph. */
+.pg-lime-word {
+  display: inline-block;
+  max-width: 100%;
+}
+
+/* Every sentence carries a faint blue tint; animate.js dims all but the
+   one being "scored", so the tint reads as a highlight moving through. */
+.pg-wave-sentence {
+  border-radius: 4px;
+  padding: 1px 2px;
+  background: color-mix(in srgb, var(--ai) 24%, transparent);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pg-scan { display: none; }
+  .pg-pulse { animation: none; }
 }
 
 /* Notes ------------------------------------------------------------------- */
@@ -494,6 +657,12 @@
   .pg-load { flex-direction: column; align-items: stretch; }
   .pg-post-head { flex-wrap: wrap; }
   .pg-post-flags { justify-content: flex-start; width: 100%; }
-  .pg-verdict { grid-template-columns: 1fr auto; }
-  .pg-verdict-state { grid-column: 1 / -1; }
+  /* Name, state and number on top; the meter gets the full width below. */
+  .pg-verdict {
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas:
+      "name  state value"
+      "meter meter meter";
+    row-gap: 8px;
+  }
 }

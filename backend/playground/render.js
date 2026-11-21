@@ -28,16 +28,23 @@ window.PlaygroundRender = (function () {
 
   /* One mock feed post: the pasted text, badged the way the extension would
      badge it. Deliberately the same .post-row / .avatar structure as the
-     "Detection that happens as you scroll" panel on index.html. */
-  function post(text, results) {
+     "Detection that happens as you scroll" panel on index.html.
+
+     `scanning` draws the same post with a light sweeping over it, for while
+     the detectors are still running. Same layout either way, so when the
+     results arrive the post stays put and only the badges appear. */
+  function post(text, results, scanning) {
     var hits = results.filter(function (r) { return r.detected; });
 
     var flags = hits.map(function (r) {
       return IG.badgeMarkup(r.type, metricValue(r));
     }).join("");
 
+    var modifier = scanning ? " is-scanning" : hits.length ? "" : " is-clean";
+
     return (
-      '<article class="pg-post' + (hits.length ? "" : " is-clean") + '">' +
+      '<article class="pg-post' + modifier + '">' +
+      (scanning ? '<span class="pg-scan" aria-hidden="true"></span>' : "") +
       '<div class="pg-post-head">' +
       '<span class="avatar" aria-hidden="true"></span>' +
       '<div class="pg-post-who">' +
@@ -51,6 +58,29 @@ window.PlaygroundRender = (function () {
     );
   }
 
+  /* The "Analyzing…" view: the post being scanned, plus one row per
+     detector with a dot pulsing in that detector's badge colors. The models
+     report no progress while classifying, so nothing here claims any. */
+  function scanning(text, types) {
+    var rows = types.map(function (type) {
+      var style = IG.detectionStyle(type);
+      var dot = style ? ' style="--dot-bg:' + style.bg + ";--dot-fg:" + style.fg + '"' : "";
+      return (
+        '<li class="pg-verdict is-pending">' +
+        '<span class="pg-verdict-name">' + IG.escapeHtml(style ? style.label : type) + "</span>" +
+        '<span class="pg-verdict-state">checking</span>' +
+        '<span class="pg-pulse" aria-hidden="true"' + dot + "></span>" +
+        "</li>"
+      );
+    }).join("");
+
+    return (
+      '<div class="pg-result-head"><h3>Analyzing…</h3></div>' +
+      post(text, [], true) +
+      '<ul class="pg-verdicts">' + rows + "</ul>"
+    );
+  }
+
   /* Every detector that ran, including the ones that declined to flag.
      This is the honest half of the result: a demo that only ever shows
      hits reads as a model that flags everything. */
@@ -61,6 +91,7 @@ window.PlaygroundRender = (function () {
       return (
         '<li class="pg-verdict' + (r.detected ? " is-hit" : "") + '">' +
         '<span class="pg-verdict-name">' + IG.escapeHtml(name) + "</span>" +
+        meter(r, name) +
         '<span class="pg-verdict-state">' +
         (r.detected ? "detected" : "not detected") +
         "</span>" +
@@ -76,6 +107,37 @@ window.PlaygroundRender = (function () {
     return '<ul class="pg-verdicts">' + rows + "</ul>" +
       '<p class="pg-verdict-note">Percentages are how confident each AI is with its classification. ' +
       '≈100% = "very confident" | ≈50% = "I have no clue what this is".</p>';
+  }
+
+  /* Two-sided confidence meter. The middle is "unsure" (50%, the lowest
+     confidence these models can report); the fill grows out from it toward
+     whichever side the detector decided on:
+
+       clean [      |██████  ] Scam      detected, 92%
+       clean [██████|        ] AI Text   not detected, 98%
+
+     This is what makes a "not detected · 98%" row readable at a glance:
+     the 98% visibly points toward clean, not toward the detection.
+
+     --lean is how far toward that side, 0 at 50% confidence up to 1 at
+     100%. It comes from `confidence`, the same number the row prints, so
+     the bar and the percentage can never disagree. The side's color comes
+     from data-type in playground.css. */
+  function meter(result, name) {
+    var lean = Math.min(1, Math.max(0, (Number(result.confidence) - 0.5) * 2));
+    var side = result.detected ? "toward" : "away";
+    var label = "Leans " + (result.detected ? "toward " + name : "clean") +
+      ", " + metricValue(result) + " confident";
+    return (
+      '<span class="pg-meter" data-type="' + IG.escapeHtml(result.type) + '"' +
+      ' role="img" aria-label="' + IG.escapeHtml(label) + '">' +
+      '<span class="pg-meter-end">clean</span>' +
+      '<span class="pg-meter-track">' +
+      '<span class="pg-meter-fill is-' + side + '" style="--lean:' + lean.toFixed(3) + '"></span>' +
+      "</span>" +
+      '<span class="pg-meter-end">' + IG.escapeHtml(name) + "</span>" +
+      "</span>"
+    );
   }
 
   /* AI text reasoning. SentenceScan gives a per-sentence AI-ness score and
@@ -210,22 +272,76 @@ window.PlaygroundRender = (function () {
      because LIME cannot say how far along it is until it is done. So this
      is an indeterminate bar plus a running clock, which is the honest
      signal: not "62% complete", just "still going, and here is how long".
-     On a long post this can legitimately run for half a minute. */
+     On a long post this can legitimately run for half a minute.
+
+     The seconds live in their own .pg-elapsed span so controller.js can
+     tick just that text. Rebuilding the whole panel every second would
+     restart every animation inside it. */
   function working(label, elapsedMs) {
     var seconds = Math.floor(elapsedMs / 1000);
     return (
       '<div class="pg-progress" aria-live="off">' +
       '<div class="pg-progress-bar is-indeterminate"><span></span></div>' +
       '<p class="pg-progress-label">' + IG.escapeHtml(label) +
-      " · " + seconds + "s</p>" +
+      ' · <span class="pg-elapsed">' + seconds + "s</span></p>" +
+      "</div>"
+    );
+  }
+
+  /* While reasoning runs, the post is re-drawn as an illustration of what
+     the model is doing to it:
+
+       scam  LIME hides random groups of words and re-checks the post, so
+             the words flicker out and back in, in random groups.
+       text  each sentence gets scored, so a highlight moves through them
+             one after another.
+
+     These are illustrations, not progress: the order and timing are made
+     up, because the bundle reports neither. The clock underneath stays the
+     only real number. The motion itself comes from animate.js, which finds
+     these by their data-illustrate attribute. Hidden from screen readers,
+     since it's the same text as the post above, just moving. */
+  function reasoningWork(type, text, elapsedMs) {
+    var illustration, head, label;
+
+    if (type === "scam") {
+      head = "Hiding random groups of words and re-checking the post, to see which words matter most…";
+      label = "running LIME over word perturbations";
+      // Split on whitespace but keep it, so the spacing and line breaks
+      // match the post exactly.
+      illustration = text.split(/(\s+)/).map(function (token) {
+        if (!token || /^\s+$/.test(token)) return IG.escapeHtml(token);
+        return '<span class="pg-lime-word">' + IG.escapeHtml(token) + "</span>";
+      }).join("");
+    } else {
+      head = "Scoring each sentence for signs of AI writing…";
+      label = "scoring sentences";
+      // A rough split, good enough to draw. The detector does its own
+      // splitting for the real scores.
+      // Every character lands in exactly one piece, so nothing goes missing.
+      var sentences = (text.match(/[^.!?\n]*(?:[.!?]+|\n|$)\s*/g) || [text])
+        .filter(function (piece) { return piece; });
+      illustration = sentences.map(function (sentence) {
+        return '<span class="pg-wave-sentence">' + IG.escapeHtml(sentence) + "</span>";
+      }).join("");
+    }
+
+    return (
+      '<div class="pg-reason is-working">' +
+      '<p class="pg-reason-head">' + head + "</p>" +
+      '<p class="pg-reason-body pg-illustration" data-illustrate="' +
+      (type === "scam" ? "lime" : "wave") + '" aria-hidden="true">' + illustration + "</p>" +
+      working(label, elapsedMs) +
       "</div>"
     );
   }
 
   return {
     post: post,
+    scanning: scanning,
     verdicts: verdicts,
     working: working,
+    reasoningWork: reasoningWork,
     sentenceScan: sentenceScan,
     scanUnavailable: scanUnavailable,
     wordAttributions: wordAttributions,

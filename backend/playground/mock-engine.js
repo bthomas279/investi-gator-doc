@@ -8,7 +8,8 @@
 
    It mirrors the REAL bundle's surface exactly — init(), detectors,
    classify(detector, text), reason(detector, text) returning the same
-   { attributions } / { scan } wrappers — so engine.js adapts both through
+   { lime_attributions } / { sw_scan } wrappers, and the same field names
+   inside them (totalSentances, band "bits") — so engine.js adapts both through
    one code path instead of each getting its own. A stand-in on a private
    side road proves nothing about the road everyone else drives on.
 
@@ -141,12 +142,14 @@ window.PlaygroundMockEngine = (function () {
     // trusts whatever `flagged` says.
     var flagged = sentences.filter(function (s) { return s.score >= 0.5; }).length;
     var fraction = sentences.length ? flagged / sentences.length : 0;
+    // Field names copied from the real bundle, typo included, so engine.js's
+    // translation is exercised by the stand-in too.
     return {
       sentences: sentences,
       flagged: flagged,
-      total: sentences.length,
+      totalSentances: sentences.length,
       aiFraction: fraction,
-      band: fraction >= 0.7 ? "mostly" : fraction >= 0.25 ? "partly" : "traces",
+      band: fraction >= 0.7 ? "mostly" : fraction >= 0.25 ? "partly" : "bits",
     };
   }
 
@@ -179,14 +182,14 @@ window.PlaygroundMockEngine = (function () {
       .sort(function (a, b) { return a.index - b.index; });
   }
 
-  /* Wrapped exactly as the bundle wraps them: { scan } for text (null when
-     the text is too short to split), { attributions } for scam. */
+  /* Wrapped exactly as the bundle wraps them: { sw_scan } for text (null
+     when the text is too short to split), { lime_attributions } for scam. */
   async function reason(detector, text) {
     if (detector === "text") {
       var scan = await reasonAiText(text);
-      return { scan: scan.total < 2 ? null : scan };
+      return { sw_scan: scan.totalSentances < 2 ? null : scan };
     }
-    if (detector === "scam") return { attributions: await reasonScam(text) };
+    if (detector === "scam") return { lime_attributions: await reasonScam(text) };
     throw new Error("no reasoning for detector: " + detector);
   }
 

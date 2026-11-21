@@ -1,0 +1,116 @@
+/* ==========================================================================
+   Investi-gator — animated background (both pages)
+
+   Two layers, both pure CSS:
+
+     Aurora      every page. Soft colored glows drifting slowly behind
+                 everything, pinned to the screen so they don't scroll away.
+     Scan grid   index.html hero only. A faint grid with a light line that
+                 sweeps down it, like the extension scanning a feed.
+
+   Only `transform` and `opacity` are animated. The browser runs those off
+   the main thread, which matters on playground.html: the models run ON the
+   main thread, so anything driven by JavaScript would freeze while they work.
+
+   Colors come from the --aurora-* / --grid-* / --scan-* tokens in main.css,
+   so light mode follows on its own. Anyone with "reduce motion" turned on
+   gets the same picture, just standing still.
+   ========================================================================== */
+
+/* Aurora ----------------------------------------------------------------- */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  /* Larger than the screen, so drifting never shows an edge. */
+  inset: -25%;
+  z-index: -1;
+  pointer-events: none;
+  will-change: transform;
+}
+
+body::before {
+  background:
+    radial-gradient(34% 30% at 24% 26%, var(--aurora-1), transparent 70%),
+    radial-gradient(30% 36% at 76% 70%, var(--aurora-2), transparent 70%);
+  animation: aurora-drift-a 18s ease-in-out infinite alternate;
+}
+
+body::after {
+  background: radial-gradient(32% 28% at 62% 24%, var(--aurora-3), transparent 70%);
+  animation: aurora-drift-b 23s ease-in-out infinite alternate;
+}
+
+/* How far and how fast the glows travel. Bigger percentages = longer
+   journeys; shorter durations above = faster. The two lengths differ so the
+   layers never line up into an obvious loop. */
+@keyframes aurora-drift-a {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  50%  { transform: translate3d(12%, 8%, 0) rotate(10deg) scale(1.12); }
+  100% { transform: translate3d(-6%, 14%, 0) rotate(-6deg) scale(0.95); }
+}
+
+@keyframes aurora-drift-b {
+  0%   { transform: translate3d(0, 0, 0) scale(1); opacity: 0.7; }
+  50%  { transform: translate3d(-14%, 10%, 0) scale(1.2); opacity: 1; }
+  100% { transform: translate3d(-4%, -10%, 0) scale(1.05); opacity: 0.8; }
+}
+
+/* Hero scan grid (index.html) ---------------------------------------------
+   ::before is the grid plus the hero's original glow, standing still.
+   ::after is the sweeping line. Both sit under the hero's text. */
+.hero > .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.hero::before,
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero::before {
+  background-image:
+    radial-gradient(60% 60% at 50% 0%, var(--accent-glow) 0%, transparent 70%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: auto, 44px 44px, 44px 44px;
+  background-position: center top;
+  /* Fade the grid out toward the edges so it has no hard border. */
+  -webkit-mask-image: radial-gradient(ellipse 75% 90% at 50% 30%, #000 35%, transparent 100%);
+  mask-image: radial-gradient(ellipse 75% 90% at 50% 30%, #000 35%, transparent 100%);
+}
+
+/* A full-height layer whose bottom edge is the bright line with a soft
+   trail above it. Sliding the whole layer from -100% to 0 moves that line
+   from the top of the hero to the bottom. */
+.hero::after {
+  background: linear-gradient(180deg,
+    transparent 72%,
+    var(--scan-trail) 97%,
+    var(--scan-line) 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+  transform: translateY(-100%);
+  opacity: 0;
+  animation: hero-scan 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+/* Sweep down over the first ~4s, fade out, then rest before the next pass. */
+@keyframes hero-scan {
+  0%        { transform: translateY(-100%); opacity: 0; }
+  8%        { opacity: 1; }
+  58%       { transform: translateY(0); opacity: 1; }
+  68%, 100% { transform: translateY(0); opacity: 0; }
+}
+
+/* Reduced motion --------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after { animation: none; }
+
+  .hero::after { display: none; }
+}

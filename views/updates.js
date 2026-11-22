@@ -186,7 +186,7 @@ var UPDATES = [
     
     sections: [
       {
-        text: "Since the cleanup is finished, I created UMLs of the extension's components/architecture and the processes it performs for every social media post post. You can view them below."
+        text: "Since the cleanup is finished, I created UMLs of the extension's components/architecture and the processes it performs for every social media post. You can view them below."
       },
       {
         files: [

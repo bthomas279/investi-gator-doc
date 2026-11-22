@@ -133,7 +133,7 @@ var UPDATES = [
   {
     type: "major",
     kicker: "Major Update",
-    title: "Patch 0.4.0: BIG logic cleanup + couple new features, future steps. ",
+    title: "Patch 0.4.0: BIG logic cleanup + couple new features, docs interactivity update,  future steps. ",
     date: "2026-11-16",
     thumb: {
       src: "public/images/delete_cache_setting.png",
@@ -144,12 +144,20 @@ var UPDATES = [
       "It's been over a month since my last update, and fortunatly that month was spent in good use. " +
       "For the most part, most of that time was spent completing a big cleanup of the general code logic. I've basically been re-organizing and re-structuring " +
       "all of the methods, functions, and flow in order to improve readability, reduce redundancy, debugging, and to prepare the extension for new future features. " +
-      "This all has been fueled by my experiences volunteering with other organizations. I've been exposed to how the stucture of a project should look like, and I'm hoping " +
+      "These changes have been fueled by my experiences volunteering with other organizations. I've been exposed to how the stucture of a project should look like, and I'm hoping " +
       "this cleanup will help make Investi-gator more official and easier to develop in the future. The docs are also using the cleaned logic bundle too.",
     
     sections: [
       {
-        heading: "New features:",
+        heading: "Documentation Site Updates",
+        text: "Hopefully you noticed some of the updates I've made to Investi-gator's website as well. I wanted visiting here to feel less static and a bit more lively. So, after some brainstorming (and a lot of prompts...), I creates some " +
+        "cool little UI features. I also made some site navigation changes to make traversing the site on mobile smoother. The model demo page recieved a UI upgrade too, as well as more flexible character inputs (I give more details on the demo page)."
+      },
+      {
+        text: "This site was never the main priority of the project, so don't expect there to be much more individual UI enhancements in the future. I'll still be giving development updates here along with new models and their most recent versions."
+      },
+      {
+        heading: "New Extension Features:",
         items: [
           "Users can now download the classificaiton and reasoning cache from chrome storage. The caches hold the post text, model classification/reasoning outputs, " +
           "and some other stuff like the platform. It's mainly meant for me since it could be helpful with finding potential classification patterns with the models, but data analysts may also find it helpful.",
@@ -183,7 +191,7 @@ var UPDATES = [
         items: [
           "Edge will not be 100% compatible: Unfortunately for some reason Edge stopped being fully compatible with Investi-gator since July and I have no clue why. You can still try to use it there but it'll likely not work on some social media platforms. ",
           "I will open Investi-gator's GitHub and I will give you steps for how to unpack it on chrome by yourself.",
-          "For you non-technical folks, I will aim to get Investi-gator approved and published on the Chrome Extension store platform! " +
+          "For you non-technical folks, I will aim to get Investi-gator approved and published on the Chrome Extension Store platform! " +
           "Unfortunately, hand-held IOS/Android devices mostly do not support chrome extensions.",
           "I will periodically update Investi-gator. Not sure how often, but I'll make sure all of the features advertised are eventually implemented."
 

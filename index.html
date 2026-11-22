@@ -96,7 +96,7 @@
         <p>Weighs post and account signals to determine whether the poster is an automated or inauthentic account.</p>
       </div>
       <div class="feat">
-        <span class="flag" data-detection="scam">Scam</span>
+        <span class="flag" data-detection="scam">Scam/Spam</span>
         <hr>
         <h3>Probable Scams</h3>
         <p>Recognizes scam, phishing, and spam patterns in posts and comments so you can avoid them before engaging.</p>
@@ -107,8 +107,8 @@
 
 <section class="block" id="passive">
   <div class="wrap">
-    <div class="highlight">
-      <div>
+    <div class="passive-layout">
+      <div class="highlight">
         <p class="eyebrow">Quick and Easy</p>
         <h2>Detection that happens as you scroll</h2>
         <p class="highlight-body">
@@ -116,28 +116,21 @@
           each post the moment it appears while quietly badging ones deemed suspicious.
         </p>
       </div>
-      <div class="pulse-demo" aria-hidden="true">
-        <div class="post-row">
-          <div class="avatar"></div>
-          <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
-          <span class="flag" data-detection="image">AI Image</span>
+
+      <!-- Looping mock feed. The posts live in views/scroll-feed-posts.js and the
+           animation in backend/scroll-feed.js, which also un-hides this figure
+           (it needs JavaScript to draw anything). Edit the caption right here. -->
+      <figure class="scroll-feed" hidden>
+        <div class="scroll-feed-window" aria-hidden="true">
+          <div class="scroll-feed-chrome"><span></span><span></span><span></span></div>
+          <div class="scroll-feed-viewport">
+            <div class="scroll-feed-track"></div>
+          </div>
         </div>
-        <div class="post-row">
-          <div class="avatar"></div>
-          <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
-          <span class="flag" data-detection="text">AI Text</span>
-        </div>
-        <div class="post-row">
-          <div class="avatar"></div>
-          <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
-          <span class="flag" data-detection="bot">Bot</span>
-        </div>
-        <div class="post-row">
-          <div class="avatar"></div>
-          <div class="post-meta"><div class="line"></div><div class="line short"></div></div>
-          <span class="flag" data-detection="scam">Scam</span>
-        </div>
-      </div>
+        <figcaption class="media-caption">
+          Disclaimer: Posts and model outputs above are not real.
+        </figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -155,7 +148,7 @@
       </div>
       <div class="step">
         <div class="num">2</div>
-        <h3>Analysis</h3>
+        <h3>Analyze</h3>
         <p>Each post's text and media are passed to the local models for analysis where they return it's classification and confidence for each type.</p>
       </div>
       <div class="step">
@@ -329,12 +322,14 @@
 <script src="backend/shared.js"></script>
 <script src="views/updates.js"></script>
 <script src="views/tech-stack.js"></script>
+<script src="views/scroll-feed-posts.js"></script>
 <!-- Motion animation library (pinned version, integrity-checked). Must load
      before nav.js; if it fails, nav.js falls back to plain CSS movement. -->
 <script src="https://cdn.jsdelivr.net/npm/motion@14.8.0/dist/motion.js"
         integrity="sha384-Jta5jWBLKsCchxkZHzUAH10Z6cUHgrNcaCOXAn9dEMzykSHuLdWyU9132cw4Ljfd"
         crossorigin="anonymous"></script>
 <script src="backend/nav.js"></script>
+<script src="backend/scroll-feed.js"></script>
 <script src="backend/main.js"></script>
 </body>
 </html>

@@ -212,7 +212,8 @@
 
 #pg-counter.is-over { color: var(--danger); }
 
-/* Below the recommended length: amber, not red. The text still classifies,
+/* Below the recommended length, or past the length the models were tuned
+   on: amber, not red. The text still classifies,
    so this is a nudge rather than a rejection. */
 #pg-counter.is-under { color: var(--warn); }
 

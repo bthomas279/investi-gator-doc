@@ -8,7 +8,7 @@
      nav.css           → <nav>       (responsive bar, hamburger, sliding pill)
      background.css    → <body>      (aurora glow, hero scan grid)
      features.css      → #features   (detector cards)
-     how-it-works.css  → #passive    (highlight panel, mock feed) + steps
+     how-it-works.css  → #passive    (highlight panel, scroll feed) + steps
      demo.css          → #demo       (screenshot / video placeholders)
      updates.css       → #updates    (patch notes feed + popup)
      tech.css          → #tech       (brand-colored tech stack badges)

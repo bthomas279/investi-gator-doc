@@ -51,7 +51,7 @@ var BADGE_STYLES = {
            </svg>`,
   },
   scam: {
-    label: 'Scam',
+    label: 'Scam/Spam',
     bg: '#fee2e2',
     fg: '#991b1b',
     icon: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"

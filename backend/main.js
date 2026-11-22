@@ -22,7 +22,7 @@
   function initScrollReveal() {
     if (prefersReducedMotion || !("IntersectionObserver" in window)) return;
 
-    var targets = document.querySelectorAll(".feat, .step, .media-item, .highlight");
+    var targets = document.querySelectorAll(".feat, .step, .media-item, .highlight, .scroll-feed:not([hidden])");
     if (!targets.length) return;
 
     var observer = new IntersectionObserver(function (entries) {

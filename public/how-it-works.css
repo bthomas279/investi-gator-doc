@@ -1,10 +1,29 @@
 /* ==========================================================================
    Investi-gator — "How it works" sections (#passive + the numbered steps)
 
-   Scope: the passive-scanning highlight panel, the mock feed inside it
-   (rows, avatars, detection badges), and the three numbered step cards.
-   Requires main.css (design tokens + section shell) to be loaded first.
+   Scope: the passive-scanning highlight panel, the looping mock feed beside
+   it, and the numbered step cards.
+   Requires main.css (design tokens + section shell) to be loaded first, and
+   demo.css for the .media-caption under the feed.
    ========================================================================== */
+
+/* Passive section layout -------------------------------------------------
+   Text panel on the left, mock feed on the right. align-items keeps the
+   panel at its own height instead of stretching to match the taller feed.
+   Without JavaScript the feed stays hidden, and .has-feed (added by
+   backend/scroll-feed.js) is what turns on the second column. Below 720px
+   the feed drops under the panel. */
+.passive-layout {
+  display: grid;
+  gap: 32px;
+  align-items: center;
+}
+
+.passive-layout.has-feed { grid-template-columns: 1.2fr 1fr; }
+
+@media (max-width: 720px) {
+  .passive-layout.has-feed { grid-template-columns: 1fr; }
+}
 
 /* Passive-scanning highlight panel --------------------------------------- */
 .highlight {
@@ -12,14 +31,10 @@
   border: 1px solid var(--card-border);
   border-radius: var(--radius);
   padding: 40px;
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 32px;
-  align-items: center;
 }
 
 @media (max-width: 720px) {
-  .highlight { grid-template-columns: 1fr; padding: 28px; }
+  .highlight { padding: 28px; }
 }
 
 .highlight h2 { margin-top: 0; }
@@ -29,35 +44,168 @@
   color: var(--text-dim);
 }
 
-/* Mock feed -------------------------------------------------------------- */
-.pulse-demo {
-  background: var(--bg);
+/* Scroll feed ------------------------------------------------------------
+   Content: views/scroll-feed-posts.js. Animation: backend/scroll-feed.js.
+   Caption text: index.html (uses .media-caption from demo.css). */
+.scroll-feed {
+  margin: 0;
+  min-width: 0;
+}
+
+/* The window around the feed. In dark mode the page's own background is
+   enough contrast. In light mode the page, the panel, and the feed are all
+   near-white, so the window gets a slightly deeper green-gray surface (the
+   white posts stand out against it) and a soft drop shadow to lift it off
+   the page. Tweak --feed-surface / --feed-shadow to adjust. */
+.scroll-feed-window {
+  --feed-surface: var(--bg);
+  --feed-shadow: none;
+  background: var(--feed-surface);
   border: 1px solid var(--card-border);
   border-radius: 12px;
-  padding: 18px;
-  font-size: 0.9rem;
+  box-shadow: var(--feed-shadow);
+  overflow: hidden;
 }
 
-.post-row {
+:root[data-theme="light"] .scroll-feed-window {
+  --feed-surface: #e8f0eb;
+  --feed-shadow: 0 1px 2px rgba(15, 26, 21, 0.06), 0 14px 34px -10px rgba(15, 26, 21, 0.18);
+}
+
+/* Top bar: three window dots */
+.scroll-feed-chrome {
+  display: flex;
+  gap: 6px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.scroll-feed-chrome span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--card-border);
+}
+
+/* Fades the posts in at the top and out at the bottom */
+.scroll-feed-viewport {
+  position: relative;
+  height: 440px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+}
+
+@media (max-width: 720px) {
+  .scroll-feed-viewport { height: 380px; }
+}
+
+/* The gap must match GAP in backend/scroll-feed.js */
+.scroll-feed-track {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  will-change: transform;
+}
+
+/* One post. Dimmed until it has been "checked", then full strength. */
+.feed-post {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  opacity: 0.5;
+  transition: opacity 0.35s ease;
+}
+
+.feed-post.is-checked { opacity: 1; }
+
+.feed-post-head {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--card-border);
+  gap: 10px;
+  min-height: 32px;
 }
 
-.post-row:last-child { border-bottom: none; }
-
-.post-meta { flex: 1; min-width: 0; }
-
-.post-meta .line {
-  height: 8px;
-  border-radius: 4px;
-  background: var(--card-border);
-  margin: 4px 0;
+.feed-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+  background: hsl(var(--avatar-hue, 150) 55% 45%);
 }
 
-.post-meta .line.short { width: 55%; }
+.feed-who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.feed-name,
+.feed-handle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feed-name { font-size: 0.84rem; font-weight: 700; }
+.feed-handle { font-size: 0.74rem; color: var(--text-dim); }
+
+.feed-badge-slot { flex-shrink: 0; }
+
+.feed-post-text {
+  margin: 8px 0 0;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+/* Stand-in photos, drawn with gradients so there are no image files */
+.feed-post-img {
+  margin-top: 9px;
+  height: 110px;
+  border-radius: 9px;
+}
+
+.feed-post-img.is-ai {
+  background:
+    radial-gradient(40% 60% at 70% 75%, #ffd27a 0%, transparent 70%),
+    linear-gradient(180deg, #ff7eb3 0%, #ff9a5a 45%, #4a3fbf 46%, #2b2a7a 100%);
+}
+
+.feed-post-img.is-real {
+  background:
+    radial-gradient(30% 50% at 30% 50%, rgba(96, 165, 250, 0.55), transparent 70%),
+    radial-gradient(35% 55% at 65% 45%, rgba(52, 211, 153, 0.45), transparent 70%),
+    linear-gradient(135deg, #e8e2d4, #d9d2c2);
+}
+
+/* The badge. Mirrors the extension's .ig-badge / .ig-badge-pct /
+   .ig-badge-extra (src/content-scripts/ui/platform-configs/*-ui.ts);
+   colors come inline from BADGE_STYLES. */
+.feed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.feed-badge svg { display: block; flex-shrink: 0; }
+.feed-badge-pct { font-variant-numeric: tabular-nums; font-weight: 600; }
+.feed-badge-extra { font-weight: 600; opacity: 0.75; margin-left: 4px; }
 
 /* Numbered steps --------------------------------------------------------- */
 .steps {

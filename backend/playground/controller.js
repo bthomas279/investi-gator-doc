@@ -22,14 +22,17 @@
   var Engine = window.PlaygroundEngine;
   var Animate = window.PlaygroundAnimate;
 
-  /* Both detectors are configured with maxLength: 256 tokens. English runs
-     roughly four characters per token, so 1000 characters is about 250
-     tokens — right up against that ceiling without going over it. Anything
-     longer would be spent on text the model never sees.
+  /* Hard cap. The model architectures can process around 2000 characters,
+     so anything longer is blocked until it's trimmed.
 
      It also bounds LIME, whose cost scales with word count. An unbounded
      paste is how you get a thirty-second explanation. */
-  var MAX_CHARS = 1500;
+  var MAX_CHARS = 2000;
+
+  /* The longest posts these model versions were tuned on. Past this the
+     models still run, but accuracy may drop, so the page says so the same
+     way it does for short posts. Nothing is disabled by this number. */
+  var TUNED_CHARS = 1500;
 
   /* A recommendation, not a rule. Short posts still classify, they just
      give the models less to work with, so the page says so and lets the
@@ -208,10 +211,12 @@
     var len = state.text.length;
     var thin = len > 0 && len < RECOMMENDED_CHARS;
     var tooLong = len > MAX_CHARS;
+    var overTuned = len > TUNED_CHARS && !tooLong;
 
     if (el.counter) {
       el.counter.textContent = len + " / " + MAX_CHARS;
-      el.counter.classList.toggle("is-under", thin);
+      // Short and long-but-allowed share the amber "is-under" color.
+      el.counter.classList.toggle("is-under", thin || overTuned);
       el.counter.classList.toggle("is-over", tooLong);
     }
 
@@ -223,9 +228,12 @@
       el.advice.textContent = thin
         ? "Under " + RECOMMENDED_CHARS + " characters. The models will still run, " +
           "but they're more likely to be inaccurate."
-        : tooLong
-          ? "Over the " + MAX_CHARS + " character limit. Trim it to run analysis."
-          : "";
+        : overTuned
+          ? "Over " + TUNED_CHARS + " characters. The models can still process this, " +
+            "but they weren't tuned on posts this long."
+          : tooLong
+            ? "Over the " + MAX_CHARS + " character limit. Trim it to run analysis."
+            : "";
       el.advice.classList.toggle("is-warn", tooLong);
     }
 
@@ -289,8 +297,8 @@
         '<section class="pg-why-block">' +
         '<button class="btn btn-ghost pg-why" type="button" data-why="' + r.type + '"' +
         (busy ? " disabled" : "") + ">" +
-        // style.label is "AI Text" or "Scam" (views/detection-styles.js), so
-        // this reads "View AI Text Reasoning" / "View Scam Reasoning".
+        // style.label is "AI Text" or "Scam/Spam" (views/detection-styles.js), so
+        // this reads "View AI Text Reasoning" / "View Scam/Spam Reasoning".
         (busy ? "Working…" : open ? "Re-run Reasoning" : "View " +
           IG.escapeHtml(style ? style.label : r.type) + " Reasoning") +
         "</button>" +

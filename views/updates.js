@@ -35,12 +35,14 @@
 
    SECTIONS
    `sections` is an ordered list of blocks. A block is either a run of notes,
-   a piece of media, or a table, so writing can continue below any of them:
+   a piece of media, a table, or file links, so writing can continue below
+   any of them:
 
      sections: [
        { heading: 'Balance', items: ['...', '...'] },
        { media: { kind: 'image', src: '...', caption: '...' } },
        { table: { headers: ['...', '...'], rows: [['...', '...']] } },
+       { files: [{ src: '...', title: '...', icon: 'sequence' }] },
        { heading: 'Known issues', text: 'Still shaking these out.' },
      ]
 
@@ -107,6 +109,37 @@
    and `maxWidth` behave the same as they do on a media slot. Wide tables
    scroll horizontally inside the popup rather than overflowing it.
 
+   FILES
+   For something too big to preview in a media slot (the UML diagrams, a
+   long PDF), a files block shows a compact card per file instead. Clicking
+   a card opens the file in a new tab, where the browser's own zoom makes it
+   readable. Cards sit side by side and stack on phones:
+
+     { files: [
+         { src: "public/images/uml-post-sequence-v0.4.png",
+           title: "Post sequence diagram",
+           description: "How one post goes from the feed to a badge to its reasoning.",
+           icon: "sequence",
+           details: "3649 × 3448 · 462 KB" },
+         { src: "public/images/uml-component-v0.4.png",
+           title: "Component diagram",
+           description: "Which files talk to which, across each extension context.",
+           icon: "component",
+           details: "2662 × 1468 · 92 KB" },
+     ] }
+
+     src          Required. A path inside the site (like the images above) or
+                  a full https:// address.
+     title        Card heading. Defaults to the file name.
+     description  Optional one-liner under the title. **Bold** works.
+     icon         "sequence", "component", or "file" (the default, a page).
+     details      Optional extra info for the small gray line. The file type
+                  (PNG, PDF…) is read from `src` and "opens in a new tab" is
+                  always added, so the line above reads
+                  "PNG · 3649 × 3448 · 462 KB · opens in a new tab".
+
+   One file works too: `files: [{ ... }]` with a single entry.
+
    Inside `excerpt`, `text`, `items`, `whatsNext`, table cells, and captions,
    wrap text in **double asterisks** to bold it. Everything else is escaped,
    so angle brackets and ampersands are safe to type literally.
@@ -118,8 +151,12 @@
                maxWidth?: string, zoom?: boolean }} UpdateMedia
    @typedef {{ headers?: string[], rows: string[][], caption?: string,
                maxWidth?: string }} UpdateTable
+   @typedef {{ src: string, title?: string, description?: string,
+               icon?: "sequence" | "component" | "file",
+               details?: string }} UpdateFile
    @typedef {{ heading?: string, text?: string | string[], items?: string[],
-               media?: UpdateMedia, table?: UpdateTable }} PatchBlock
+               media?: UpdateMedia, table?: UpdateTable,
+               files?: UpdateFile[] }} PatchBlock
    @typedef {{ type: "major" | "minor", kicker?: string, title: string,
                date: string, thumb?: { src: string, alt?: string,
                  width?: string, ratio?: string,
@@ -133,7 +170,7 @@ var UPDATES = [
   {
     type: "major",
     kicker: "Major Update",
-    title: "Patch 0.4.0: BIG logic cleanup + couple new features, docs interactivity update,  future steps. ",
+    title: "Patch 0.4.0: BIG logic cleanup + couple new features, docs interactivity update, extension UMLs, future steps. ",
     date: "2026-11-16",
     thumb: {
       src: "public/images/delete_cache_setting.png",
@@ -149,12 +186,29 @@ var UPDATES = [
     
     sections: [
       {
+        text: "Since the cleanup is finished, I created UMLs of the extension's components/architecture and the processes it performs for every social media post post. You can view them below."
+      },
+      {
+        files: [
+          { src: "public/images/uml-post-sequence-v0.4.png",
+            title: "Post Sequence Diagram",
+            description: "Investi-gator's step-by-step actions when processing each post.",
+            icon: "sequence",
+            details: "3649 × 3448 · 462 KB" },
+          { src: "public/images/uml-component-v0.4.png",
+            title: "Component Diagram",
+            description: "Current communication between every file.",
+            icon: "component",
+            details: "2662 × 1468 · 92 KB" },
+        ]
+      },
+      {
         heading: "Documentation Site Updates",
-        text: "Hopefully you noticed some of the updates I've made to Investi-gator's website as well. I wanted visiting here to feel less static and a bit more lively. So, after some brainstorming (and a lot of prompts...), I creates some " +
+        text: "Hopefully you noticed some of the updates I've made to Investi-gator's website as well. I wanted visiting here to feel less static and a bit more lively. So, after some brainstorming (and a lot of prompts...), I created some " +
         "cool little UI features. I also made some site navigation changes to make traversing the site on mobile smoother. The model demo page recieved a UI upgrade too, as well as more flexible character inputs (I give more details on the demo page)."
       },
       {
-        text: "This site was never the main priority of the project, so don't expect there to be much more individual UI enhancements in the future. I'll still be giving development updates here along with new models and their most recent versions."
+        text: "This site was never the main focus of the project, so don't expect there to be much more individual UI enhancements in the future. I'll still be giving development updates here along with new models and their most recent versions."
       },
       {
         heading: "New Extension Features:",
@@ -164,7 +218,6 @@ var UPDATES = [
           "The caches are now saved in chrome local storage. This means that both caches won't clear when your browser closes anymore. Of course, you can delete your cache in the settings too. This can take up space, so I plan on creating an option to save " +
           "the caches in local storage or just keep them in session storage (deletes when the session ends)."
         ]
-        
       },
       {
         media: {

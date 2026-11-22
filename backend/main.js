@@ -344,6 +344,75 @@
     );
   }
 
+  /* File links ------------------------------------------------------------
+     For files too big to preview in a media slot, like the UML diagrams: a
+     compact card per file that opens it in a new tab, where the browser's
+     own zoom makes it readable. Cards sit side by side and stack on phones
+     (see .update-files in updates.css). */
+
+  // Small glyphs for the card's icon tile. `icon` picks one; anything else
+  // gets the generic document.
+  var FILE_ICONS = {
+    sequence:
+      '<line x1="5" y1="3" x2="5" y2="21"/><line x1="19" y1="3" x2="19" y2="21"/>' +
+      '<path d="M5 8h12"/><path d="M15 6l2 2-2 2"/><path d="M19 15H7"/><path d="M9 13l-2 2 2 2"/>',
+    component:
+      '<rect x="3" y="3" width="7" height="6" rx="1.5"/><rect x="14" y="3" width="7" height="6" rx="1.5"/>' +
+      '<rect x="8.5" y="15" width="7" height="6" rx="1.5"/><path d="M6.5 9v3h11V9"/><path d="M12 12v3"/>',
+    file:
+      '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>' +
+      '<line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>',
+  };
+
+  var ARROW_ICON =
+    '<svg class="file-card-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>';
+
+  // Only a path inside the site or an http(s) address, so a typo'd or
+  // hostile `src` can't become a javascript: link.
+  function safeHref(src) {
+    var href = String(src == null ? "" : src).trim();
+    if (/^https?:\/\//i.test(href)) return href;
+    if (!href || /^[a-z][\w+.-]*:/i.test(href) || href.indexOf("//") === 0) return "";
+    return href;
+  }
+
+  function fileCardMarkup(file) {
+    var href = file && safeHref(file.src);
+    if (!href) return "";
+
+    // "PNG" from "images/diagram.png", then the author's details, then a
+    // reminder of where it opens.
+    var type = (href.split(/[?#]/)[0].match(/\.(\w+)$/) || [])[1];
+    var meta = [type && type.toUpperCase(), file.details, "opens in a new tab"]
+      .filter(Boolean)
+      .map(escapeHtml)
+      .join(" · ");
+
+    var icon = FILE_ICONS[file.icon] || FILE_ICONS.file;
+    var title = file.title || href.split("/").pop();
+
+    return (
+      '<a class="file-card" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">' +
+      '<span class="file-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" ' +
+      'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      icon + "</svg></span>" +
+      '<span class="file-card-body">' +
+      '<span class="file-card-title">' + escapeHtml(title) + "</span>" +
+      (file.description ? '<span class="file-card-desc">' + inlineText(file.description, true) + "</span>" : "") +
+      '<span class="file-card-meta">' + meta + "</span>" +
+      "</span>" +
+      ARROW_ICON +
+      "</a>"
+    );
+  }
+
+  function filesMarkup(files) {
+    var cards = [].concat(files || []).map(fileCardMarkup).join("");
+    return cards ? '<div class="update-files">' + cards + "</div>" : "";
+  }
+
   /* The prose and bullets of a notes block, without its wrapper. Shared by
      the patch notes themselves and the "What's Next?" panel. */
   function notesMarkup(block) {
@@ -377,6 +446,7 @@
     if (!block) return "";
     if (block.media) return updateMediaMarkup(block.media);
     if (block.table) return tableMarkup(block.table);
+    if (block.files) return filesMarkup(block.files);
 
     return (
       '<div class="patch-section">' +

@@ -396,6 +396,100 @@ body.no-scroll { overflow: hidden; }
   line-height: 1.5;
 }
 
+/* File link cards inside the popup ----------------------------------------
+   A `files` block (see views/updates.js): one card per file, opening it in a
+   new tab. For things too large to preview, like the UML diagrams. Same slot
+   rules as .update-media. Cards share a row while each can be at least
+   260px wide, and stack once they can't. */
+.update-files {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin: 26px 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--card-border);
+}
+
+.update-files:last-child { margin-bottom: 0; }
+
+.file-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.12s ease, transform 0.12s ease;
+}
+
+.file-card:hover,
+.file-card:focus-visible {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  text-decoration: none;
+  outline: none;
+}
+
+.file-card-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+.file-card-body { flex: 1; min-width: 0; }
+
+.file-card-title {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.file-card-desc {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.file-card-meta {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+.file-card-arrow {
+  flex-shrink: 0;
+  color: var(--text-dim);
+  transition: color 0.12s ease, transform 0.12s ease;
+}
+
+.file-card:hover .file-card-arrow,
+.file-card:focus-visible .file-card-arrow {
+  color: var(--accent);
+  transform: translate(2px, -2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .file-card,
+  .file-card-arrow { transition: none; }
+  .file-card:hover,
+  .file-card:focus-visible { transform: none; }
+  .file-card:hover .file-card-arrow,
+  .file-card:focus-visible .file-card-arrow { transform: none; }
+}
+
 /* Optional table inside the popup -----------------------------------------
    Same slot rules as .update-media: sits anywhere in the notes, spaced on
    both sides, no trailing gap at the very end. The side margins inset it
